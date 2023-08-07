@@ -1,0 +1,48 @@
+<!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
+<idea-plugin>
+    <!-- Unique identifier of the plugin. It should be FQN. It cannot be changed between the plugin versions. -->
+    <id>kieda.yapping-intellij</id>
+
+    <!-- Public plugin name should be written in Title Case.
+         Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-name -->
+    <name>Yapping Language</name>
+
+    <!-- A displayed Vendor name or Organization ID displayed on the Plugins Page. -->
+    <vendor email="zkieda@alumni.cmu.edu" url="https://github.com/kieda">Hostile Robot</vendor>
+
+    <!-- Description of the plugin displayed on the Plugin Page and IDE Plugin Manager.
+         Simple HTML elements (text formatting, paragraphs, and lists) can be added inside of <![CDATA[ ]]> tag.
+         Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-description -->
+    <description><![CDATA[
+        IntelliJ plugin for the Yapping language!
+        Yapping is a dynamically typed language that can be parsed as a datastructure or run as a script depending on
+        the running java instance.
+
+        Yapping provides methods to interact with existing data in java, and to tinker with fields and values to allow
+        you to iterate faster.
+    ]]></description>
+
+    <!-- Product and plugin compatibility requirements.
+         Read more: https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
+    <depends>com.intellij.modules.platform</depends>
+
+    <!-- Extension points defined by the plugin.
+         Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
+    <extensions defaultExtensionNs="com.intellij">
+        <fileType name="Yap Header"
+                  implementationClass="io.hostilerobot.yapping.intellijplugin.filetypes.YahFileType"
+                  fieldName="INSTANCE"
+                  language="Yapping"
+                  extensions="yah" />
+        <fileType name="Yap Script"
+                  implementationClass="io.hostilerobot.yapping.intellijplugin.filetypes.YasFileType"
+                  fieldName="INSTANCE"
+                  language="Yapping"
+                  extensions="yas" />
+        <fileType name="Yap File"
+                  implementationClass="io.hostilerobot.yapping.intellijplugin.filetypes.YapFileType"
+                  fieldName="INSTANCE"
+                  language="Yapping"
+                  extensions="yap" />
+    </extensions>
+</idea-plugin>

@@ -1,0 +1,25 @@
+// This is a generated file. Not intended for manual editing.
+package io.hostilerobot.yapping.parser.psi;
+
+import java.util.List;
+import org.jetbrains.annotations.*;
+import com.intellij.psi.PsiElement;
+
+public interface YappingSectionKey extends PsiElement {
+
+  @Nullable
+  YappingBaseData getBaseData();
+
+  @Nullable
+  YappingCproperties getCproperties();
+
+  @Nullable
+  YappingJscopeSegment getJscopeSegment();
+
+  @Nullable
+  YappingList getList();
+
+  @Nullable
+  YappingScope getScope();
+
+}
