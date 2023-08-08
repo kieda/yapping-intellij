@@ -27,10 +27,4 @@ public class YappingFpathImpl extends ASTWrapperPsiElement implements YappingFpa
     else super.accept(visitor);
   }
 
-  @Override
-  @NotNull
-  public YappingFscopeSegment getFscopeSegment() {
-    return findNotNullChildByClass(YappingFscopeSegment.class);
-  }
-
 }

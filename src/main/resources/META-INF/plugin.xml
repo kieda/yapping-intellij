@@ -44,5 +44,8 @@
                   fieldName="INSTANCE"
                   language="Yapping"
                   extensions="yap" />
+        <lang.parserDefinition
+                language="Yapping"
+                implementationClass="io.hostilerobot.yapping.parser.YappingParserDefinition"/>
     </extensions>
 </idea-plugin>

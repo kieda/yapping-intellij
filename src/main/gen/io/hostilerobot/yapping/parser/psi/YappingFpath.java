@@ -7,7 +7,4 @@ import com.intellij.psi.PsiElement;
 
 public interface YappingFpath extends PsiElement {
 
-  @NotNull
-  YappingFscopeSegment getFscopeSegment();
-
 }

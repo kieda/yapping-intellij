@@ -27,10 +27,4 @@ public class YappingJpathImpl extends ASTWrapperPsiElement implements YappingJpa
     else super.accept(visitor);
   }
 
-  @Override
-  @NotNull
-  public YappingJscopeSegment getJscopeSegment() {
-    return findNotNullChildByClass(YappingJscopeSegment.class);
-  }
-
 }

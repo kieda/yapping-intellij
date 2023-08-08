@@ -11,26 +11,20 @@ import static io.hostilerobot.yapping.parser.YappingTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import io.hostilerobot.yapping.parser.psi.*;
 
-public class YappingLpropertiesImpl extends ASTWrapperPsiElement implements YappingLproperties {
+public class YappingYscopeSegmentImpl extends ASTWrapperPsiElement implements YappingYscopeSegment {
 
-  public YappingLpropertiesImpl(@NotNull ASTNode node) {
+  public YappingYscopeSegmentImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull YappingVisitor visitor) {
-    visitor.visitLproperties(this);
+    visitor.visitYscopeSegment(this);
   }
 
   @Override
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof YappingVisitor) accept((YappingVisitor)visitor);
     else super.accept(visitor);
-  }
-
-  @Override
-  @NotNull
-  public YappingMproperties getMproperties() {
-    return findNotNullChildByClass(YappingMproperties.class);
   }
 
 }

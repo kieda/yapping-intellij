@@ -1,4 +1,4 @@
-package io.hostilerobot.yapping.parser.token;
+package io.hostilerobot.yapping.token;
 
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.psi.tree.IElementType;

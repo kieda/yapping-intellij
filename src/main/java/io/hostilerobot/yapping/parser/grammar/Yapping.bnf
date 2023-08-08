@@ -8,49 +8,64 @@
     psiImplPackage="io.hostilerobot.yapping.parser.psi.impl"
 
     elementTypeHolderClass="io.hostilerobot.yapping.parser.YappingTypes"
-    elementTypeClass="io.hostilerobot.yapping.parser.token.YappingElementType"
-    tokenTypeClass="io.hostilerobot.yapping.parser.token.YappingTokenType"
+    elementTypeClass="io.hostilerobot.yapping.token.YappingElementType"
+    tokenTypeClass="io.hostilerobot.yapping.token.YappingTokenType"
 }
 
-
+/*
 SIGN ::= PLUS|MINUS
 INTEGER ::= SIGN? NATURAL
+*/
+yapping ::= item*
+item ::= JPATH|FPATH|COMMENT|WHITESPACE
+JPATH ::= JPATH_START spacing JSCOPE
+FPATH ::= (FPATH_START spacing FSCOPE)
 
-private JSCOPE_STR ::= (REGEX|NAME|LITERAL)
+private JSCOPE ::= JSCOPE_SEGMENT spacing (DOT spacing JSCOPE)?
+private FSCOPE ::= FSCOPE_SEGMENT spacing (SLASH spacing FSCOPE)?
+private spacing ::= (WHITESPACE|COMMENT)*
 
-// note - we shouldn't permit spaces or comments in between
-//        parts of the resolutions
+// ::JSCOPE_SEGMENT::
 // `[a-z]`0`[a-z]`1       x0y1
 // "asdf"0"asdf"`[a-z]`   asdf0asdfx
 // asdf"asdf"0`[a-z]`     asdfasdf0x
+// asdf"asdf"0abc         asdfasdf0abc
 // 1                      <invalid>
 // 0"asdf"                <invalid>
 // 0`[1-9]`               <invalid>
-JSCOPE_SEGMENT ::= JSCOPE_STR (JSCOPE_STR|NATURAL)*
+private JSCOPE_SEGMENT ::= JSCOPE_START JSCOPE_BODY*
 
+YSCOPE_SEGMENT ::= YINDEX_SEGMENT|YNAME_SEGMENT
+private NAT_ALLOWED ::= (YINDEX_SEGMENT|REGEX_EXPECTED)
+private YINDEX_SEGMENT ::= NATURAL REGEX_EXPECTED?
+private REGEX_EXPECTED ::= REGEX NAT_ALLOWED?
+
+private YNAME_SEGMENT ::= YNAME_START YNAME_BODY*
+private YNAME_START ::= (YNAME|YNAME_PART)
+private YNAME_BODY ::= (YBODY|YNAME_PART)
+private YNAME_PART ::= (REGEX|LITERAL)
+
+// ::FSCOPE_SEGMENT::
 // 0file.yap            "0file.yap"
 // 0"fil/e".yap         "0fil/e.yap"
 // 1`[a-z]+`.yap        "1delta.yap"
-FSCOPE_SEGMENT ::= (REGEX|FNAME|LITERAL)+
-
 // 0`[1-9]`               05
 // 0`[1-9]`5              015
 // 0`[1-9]``[3-5]`        093
 // 0 5                    <invalid>
-private EMPTY ::= ()
-private NAT_ALLOWED ::= (NATURAL REGEX_EXPECTED|REGEX NAT_ALLOWED|EMPTY)
-private REGEX_EXPECTED ::= (REGEX NAT_ALLOWED|EMPTY)
-INDEX_RESOLUTION ::= NATURAL REGEX_EXPECTED
+private FSCOPE_SEGMENT ::= (REGEX|FNAME|LITERAL)+
+
+private JSCOPE_START ::= (JNAME|JSCOPE_PART)  // JNAME cannot start with 0-9
+private JSCOPE_BODY  ::= (JBODY|JSCOPE_PART)  // but JBODY can
+private JSCOPE_PART ::= (REGEX|LITERAL)
+
+/*
 
 FRACTION ::= (SIGN? NATURAL)? SIGN? NATURAL FRACTION_SEP NATURAL
 private PRIMITIVE ::= (DECIMAL|INTEGER|REGEX|NAME|LITERAL|FRACTION)
+*/
 
-// todo - should these scopes be done during lexing?
-private JSCOPE ::= JSCOPE_SEGMENT (DOT JSCOPE)?
-JPATH ::= JPATH_START JSCOPE
-private FSCOPE ::= FSCOPE_SEGMENT (SLASH FSCOPE)?
-FPATH ::= FPATH_START FSCOPE
-
+/*
 BASE_DATA ::= (LIST|PRIMITIVE)
 SECTION_DATA ::= (BASE_DATA|CPROPERTIES|PAIR)
 private LIST_DATA ::= (BASE_DATA|APROPERTIES|PAIR)
@@ -67,7 +82,7 @@ CPROPERTIES ::= PROPERTIES_SEP MPROPERTIES PROPERTIES_SEP
 LPROPERTIES ::= PROPERTIES_SEP MPROPERTIES PROPERTIES_SEP? // left is required
 RPROPERTIES ::= PROPERTIES_SEP? MPROPERTIES PROPERTIES_END // right is required
 SCOPE ::= DOT (JSCOPE_SEGMENT | INDEX_RESOLUTION)\
-
+*/
 // want: an arbitrary expression that evaluates to a list or an environment
 // what thing are possible?
 // (MAP).scope
@@ -75,7 +90,7 @@ SCOPE ::= DOT (JSCOPE_SEGMENT | INDEX_RESOLUTION)\
 // :properties;.scope
 // properties;.scope
 // :properties.scope    -- does not work. must be right leaning
-
+/*
 private PAIR_KEY_DATA ::= (RPROPERTIES|BASE_DATA)
 private PAIR_VAL_DATA ::= LIST_DATA
 PAIR ::= PAIR_KEY_DATA PAIR_SEP PAIR_VAL_DATA
@@ -83,6 +98,8 @@ PAIR ::= PAIR_KEY_DATA PAIR_SEP PAIR_VAL_DATA
 MAP ::= MAP_START
 
         MAP_END
+
+ */
 // section:
 //    NAME|(...)
 
