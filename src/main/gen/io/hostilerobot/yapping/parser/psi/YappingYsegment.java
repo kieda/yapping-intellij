@@ -5,15 +5,6 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface YappingItem extends PsiElement {
-
-  @Nullable
-  YappingFpath getFpath();
-
-  @Nullable
-  YappingJpath getJpath();
-
-  @Nullable
-  YappingYsegment getYsegment();
+public interface YappingYsegment extends PsiElement {
 
 }

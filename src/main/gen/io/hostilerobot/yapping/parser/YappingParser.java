@@ -208,130 +208,134 @@ public class YappingParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // YINDEX_SEGMENT|REGEX_EXPECTED
-  static boolean NAT_ALLOWED(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "NAT_ALLOWED")) return false;
-    if (!nextTokenIs(b, "", NATURAL, REGEX)) return false;
+  // (NATURAL (YSEG_START YSEG_PART*)?)|(YNAME YSEG_PART*)|(YSEG_START YSEG_PART*)
+  public static boolean YSEGMENT(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "YSEGMENT")) return false;
     boolean r;
-    r = YINDEX_SEGMENT(b, l + 1);
-    if (!r) r = REGEX_EXPECTED(b, l + 1);
+    Marker m = enter_section_(b, l, _NONE_, YSEGMENT, "<ysegment>");
+    r = YSEGMENT_0(b, l + 1);
+    if (!r) r = YSEGMENT_1(b, l + 1);
+    if (!r) r = YSEGMENT_2(b, l + 1);
+    exit_section_(b, l, m, r, false, null);
     return r;
   }
 
-  /* ********************************************************** */
-  // REGEX NAT_ALLOWED?
-  static boolean REGEX_EXPECTED(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "REGEX_EXPECTED")) return false;
-    if (!nextTokenIs(b, REGEX)) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeToken(b, REGEX);
-    r = r && REGEX_EXPECTED_1(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // NAT_ALLOWED?
-  private static boolean REGEX_EXPECTED_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "REGEX_EXPECTED_1")) return false;
-    NAT_ALLOWED(b, l + 1);
-    return true;
-  }
-
-  /* ********************************************************** */
-  // NATURAL REGEX_EXPECTED?
-  static boolean YINDEX_SEGMENT(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "YINDEX_SEGMENT")) return false;
-    if (!nextTokenIs(b, NATURAL)) return false;
+  // NATURAL (YSEG_START YSEG_PART*)?
+  private static boolean YSEGMENT_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "YSEGMENT_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeToken(b, NATURAL);
-    r = r && YINDEX_SEGMENT_1(b, l + 1);
+    r = r && YSEGMENT_0_1(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
-  // REGEX_EXPECTED?
-  private static boolean YINDEX_SEGMENT_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "YINDEX_SEGMENT_1")) return false;
-    REGEX_EXPECTED(b, l + 1);
+  // (YSEG_START YSEG_PART*)?
+  private static boolean YSEGMENT_0_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "YSEGMENT_0_1")) return false;
+    YSEGMENT_0_1_0(b, l + 1);
     return true;
   }
 
-  /* ********************************************************** */
-  // YBODY|YNAME_PART
-  static boolean YNAME_BODY(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "YNAME_BODY")) return false;
-    boolean r;
-    r = consumeToken(b, YBODY);
-    if (!r) r = YNAME_PART(b, l + 1);
-    return r;
-  }
-
-  /* ********************************************************** */
-  // REGEX|LITERAL
-  static boolean YNAME_PART(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "YNAME_PART")) return false;
-    if (!nextTokenIs(b, "", LITERAL, REGEX)) return false;
-    boolean r;
-    r = consumeToken(b, REGEX);
-    if (!r) r = consumeToken(b, LITERAL);
-    return r;
-  }
-
-  /* ********************************************************** */
-  // YNAME_START YNAME_BODY*
-  static boolean YNAME_SEGMENT(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "YNAME_SEGMENT")) return false;
+  // YSEG_START YSEG_PART*
+  private static boolean YSEGMENT_0_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "YSEGMENT_0_1_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = YNAME_START(b, l + 1);
-    r = r && YNAME_SEGMENT_1(b, l + 1);
+    r = YSEG_START(b, l + 1);
+    r = r && YSEGMENT_0_1_0_1(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
-  // YNAME_BODY*
-  private static boolean YNAME_SEGMENT_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "YNAME_SEGMENT_1")) return false;
+  // YSEG_PART*
+  private static boolean YSEGMENT_0_1_0_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "YSEGMENT_0_1_0_1")) return false;
     while (true) {
       int c = current_position_(b);
-      if (!YNAME_BODY(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "YNAME_SEGMENT_1", c)) break;
+      if (!YSEG_PART(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "YSEGMENT_0_1_0_1", c)) break;
+    }
+    return true;
+  }
+
+  // YNAME YSEG_PART*
+  private static boolean YSEGMENT_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "YSEGMENT_1")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, YNAME);
+    r = r && YSEGMENT_1_1(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // YSEG_PART*
+  private static boolean YSEGMENT_1_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "YSEGMENT_1_1")) return false;
+    while (true) {
+      int c = current_position_(b);
+      if (!YSEG_PART(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "YSEGMENT_1_1", c)) break;
+    }
+    return true;
+  }
+
+  // YSEG_START YSEG_PART*
+  private static boolean YSEGMENT_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "YSEGMENT_2")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = YSEG_START(b, l + 1);
+    r = r && YSEGMENT_2_1(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // YSEG_PART*
+  private static boolean YSEGMENT_2_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "YSEGMENT_2_1")) return false;
+    while (true) {
+      int c = current_position_(b);
+      if (!YSEG_PART(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "YSEGMENT_2_1", c)) break;
     }
     return true;
   }
 
   /* ********************************************************** */
-  // YNAME|YNAME_PART
-  static boolean YNAME_START(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "YNAME_START")) return false;
+  // YBODY|NATURAL|LITERAL|REGEX
+  static boolean YSEG_PART(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "YSEG_PART")) return false;
     boolean r;
-    r = consumeToken(b, YNAME);
-    if (!r) r = YNAME_PART(b, l + 1);
+    r = consumeToken(b, YBODY);
+    if (!r) r = consumeToken(b, NATURAL);
+    if (!r) r = consumeToken(b, LITERAL);
+    if (!r) r = consumeToken(b, REGEX);
     return r;
   }
 
   /* ********************************************************** */
-  // YINDEX_SEGMENT|YNAME_SEGMENT
-  public static boolean YSCOPE_SEGMENT(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "YSCOPE_SEGMENT")) return false;
+  // LITERAL|REGEX
+  static boolean YSEG_START(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "YSEG_START")) return false;
+    if (!nextTokenIs(b, "", LITERAL, REGEX)) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _NONE_, YSCOPE_SEGMENT, "<yscope segment>");
-    r = YINDEX_SEGMENT(b, l + 1);
-    if (!r) r = YNAME_SEGMENT(b, l + 1);
-    exit_section_(b, l, m, r, false, null);
+    r = consumeToken(b, LITERAL);
+    if (!r) r = consumeToken(b, REGEX);
     return r;
   }
 
   /* ********************************************************** */
-  // JPATH|FPATH|COMMENT|WHITESPACE
+  // JPATH|FPATH|YSEGMENT|COMMENT|WHITESPACE
   public static boolean item(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "item")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, ITEM, "<item>");
     r = JPATH(b, l + 1);
     if (!r) r = FPATH(b, l + 1);
+    if (!r) r = YSEGMENT(b, l + 1);
     if (!r) r = consumeToken(b, COMMENT);
     if (!r) r = consumeToken(b, WHITESPACE);
     exit_section_(b, l, m, r, false, null);

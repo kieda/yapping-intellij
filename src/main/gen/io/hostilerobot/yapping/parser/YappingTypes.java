@@ -13,7 +13,7 @@ public interface YappingTypes {
   IElementType FPATH = new YappingElementType("FPATH");
   IElementType ITEM = new YappingElementType("ITEM");
   IElementType JPATH = new YappingElementType("JPATH");
-  IElementType YSCOPE_SEGMENT = new YappingElementType("YSCOPE_SEGMENT");
+  IElementType YSEGMENT = new YappingElementType("YSEGMENT");
 
   IElementType COMMENT = new YappingTokenType("COMMENT");
   IElementType DOT = new YappingTokenType("DOT");
@@ -42,8 +42,8 @@ public interface YappingTypes {
       else if (type == JPATH) {
         return new YappingJpathImpl(node);
       }
-      else if (type == YSCOPE_SEGMENT) {
-        return new YappingYscopeSegmentImpl(node);
+      else if (type == YSEGMENT) {
+        return new YappingYsegmentImpl(node);
       }
       throw new AssertionError("Unknown element type: " + type);
     }

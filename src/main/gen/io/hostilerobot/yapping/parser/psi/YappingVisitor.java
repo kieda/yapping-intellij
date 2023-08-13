@@ -15,7 +15,7 @@ public class YappingVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
-  public void visitYscopeSegment(@NotNull YappingYscopeSegment o) {
+  public void visitYsegment(@NotNull YappingYsegment o) {
     visitPsiElement(o);
   }
 

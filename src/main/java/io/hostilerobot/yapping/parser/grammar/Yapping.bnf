@@ -17,7 +17,7 @@ SIGN ::= PLUS|MINUS
 INTEGER ::= SIGN? NATURAL
 */
 yapping ::= item*
-item ::= JPATH|FPATH|COMMENT|WHITESPACE
+item ::= JPATH|FPATH|YSEGMENT|COMMENT|WHITESPACE
 JPATH ::= JPATH_START spacing JSCOPE
 FPATH ::= (FPATH_START spacing FSCOPE)
 
@@ -35,15 +35,30 @@ private spacing ::= (WHITESPACE|COMMENT)*
 // 0`[1-9]`               <invalid>
 private JSCOPE_SEGMENT ::= JSCOPE_START JSCOPE_BODY*
 
-YSCOPE_SEGMENT ::= YINDEX_SEGMENT|YNAME_SEGMENT
-private NAT_ALLOWED ::= (YINDEX_SEGMENT|REGEX_EXPECTED)
-private YINDEX_SEGMENT ::= NATURAL REGEX_EXPECTED?
-private REGEX_EXPECTED ::= REGEX NAT_ALLOWED?
-
-private YNAME_SEGMENT ::= YNAME_START YNAME_BODY*
-private YNAME_START ::= (YNAME|YNAME_PART)
-private YNAME_BODY ::= (YBODY|YNAME_PART)
-private YNAME_PART ::= (REGEX|LITERAL)
+/// connect any number of paths using "asdf"+(123, 456).0+"abc"
+/**
+ * y = [1, 2, 3, 4]
+ * y`k v~k<`(y.len.`~/2`)
+ * y"asdf" + (123).0 +
+ * TODO - custom regex specifically for integers and indices
+ * DFA for processing integers
+ */
+YSEGMENT ::= (NATURAL (YSEG_START YSEG_PART*)?)|(YNAME YSEG_PART*)|(YSEG_START YSEG_PART*)
+private YSEG_START ::= LITERAL|REGEX
+private YSEG_PART ::= (YBODY|NATURAL|LITERAL|REGEX)
+// NATURAL -> LITERAL -> (ANY)
+// @`asdf`( !`asdf`asdf( sadf`asdf` ) )
+// keep a stack of items. `asdf`{ abc = ced, def = hij }"asdf"
+// {k1 = 1, v1 = 2, v3 = {x = 3, y = 3, x = 2} }.{`[kv]1` = `\<2`, "v3" = {x = `\>=3` } }
+//YSCOPE_SEGMENT ::= YINDEX_SEGMENT|YNAME_SEGMENT
+//private NAT_ALLOWED ::= (YINDEX_SEGMENT|REGEX_EXPECTED)
+//private YINDEX_SEGMENT ::= NATURAL REGEX_EXPECTED?
+//private REGEX_EXPECTED ::= REGEX NAT_ALLOWED?
+//
+//private YNAME_SEGMENT ::= YNAME_START YNAME_BODY*
+//private YNAME_START ::= (YNAME|YNAME_PART)
+//private YNAME_BODY ::= (YBODY|YNAME_PART)
+//private YNAME_PART ::= (REGEX|LITERAL)
 
 // ::FSCOPE_SEGMENT::
 // 0file.yap            "0file.yap"

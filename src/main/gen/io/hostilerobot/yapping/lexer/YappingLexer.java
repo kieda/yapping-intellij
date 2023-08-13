@@ -3,11 +3,10 @@
 
 package io.hostilerobot.yapping.lexer;
 
-import com.intellij.lexer.FlexLexer;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.TokenType;
 
-import io.hostilerobot.yapping.parser.YappingTypes;
+import io.hostilerobot.yapping.parser.YappingTypes;import java.util.ArrayDeque;import java.util.Deque;
 
 
 class YappingLexer implements FlexLexer {
@@ -29,6 +28,9 @@ class YappingLexer implements FlexLexer {
   public static final int BEFORE_JSCOPE = 14;
   public static final int AFTER_JSCOPE = 16;
   public static final int PENDING_JSCOPE = 18;
+  public static final int BEFORE_YSCOPE = 20;
+  public static final int AFTER_YSCOPE = 22;
+  public static final int PENDING_YSCOPE = 24;
 
   /**
    * ZZ_LEXSTATE[l] is the state in the DFA for the lexical state l
@@ -38,7 +40,7 @@ class YappingLexer implements FlexLexer {
    */
   private static final int ZZ_LEXSTATE[] = {
      0,  0,  1,  1,  2,  2,  3,  3,  4,  4,  5,  5,  6,  6,  7,  7, 
-     8,  8,  9, 9
+     8,  8,  9,  9, 10, 10, 11, 11, 12, 12
   };
 
   /**
@@ -97,8 +99,8 @@ class YappingLexer implements FlexLexer {
   private static final String ZZ_CMAP_BLOCKS_PACKED_0 =
     "\11\0\1\1\1\2\1\3\1\1\1\4\16\0\4\3"+
     "\1\1\1\5\1\6\1\7\1\10\11\3\1\11\1\12"+
-    "\12\0\6\3\1\13\32\10\1\14\1\15\1\16\1\3"+
-    "\1\10\1\17\32\10\4\3\41\0\2\3\4\10\4\3"+
+    "\12\13\6\3\1\14\32\10\1\15\1\16\1\17\1\3"+
+    "\1\10\1\20\32\10\4\3\41\0\2\3\4\10\4\3"+
     "\1\10\2\3\1\0\7\3\1\10\4\3\1\10\5\3"+
     "\27\10\1\3\37\10\1\3\u01ca\10\4\3\14\10\16\3"+
     "\5\10\7\3\1\10\1\3\1\10\21\3\160\0\5\10"+
@@ -344,14 +346,15 @@ class YappingLexer implements FlexLexer {
   private static final int [] ZZ_ACTION = zzUnpackAction();
 
   private static final String ZZ_ACTION_PACKED_0 =
-    "\12\0\1\1\2\2\1\3\1\4\1\5\1\6\1\7"+
-    "\1\10\1\11\1\1\1\10\1\12\1\1\1\13\1\10"+
-    "\1\14\1\15\2\16\1\17\1\20\1\21\1\22\1\23"+
-    "\1\24\2\25\1\26\1\27\1\30\2\5\1\10\2\20"+
-    "\2\26";
+    "\15\0\1\1\2\2\1\3\1\4\1\5\1\6\1\7"+
+    "\1\10\1\11\1\12\1\13\1\6\1\12\1\14\1\6"+
+    "\1\15\1\12\1\16\1\17\2\20\1\21\1\22\1\23"+
+    "\1\24\1\25\1\26\2\27\1\30\1\31\1\32\1\33"+
+    "\2\34\1\35\1\36\1\37\1\40\1\41\2\5\1\12"+
+    "\2\22\2\30\2\35";
 
   private static int [] zzUnpackAction() {
-    int [] result = new int[48];
+    int [] result = new int[63];
     int offset = 0;
     offset = zzUnpackAction(ZZ_ACTION_PACKED_0, offset, result);
     return result;
@@ -376,15 +379,17 @@ class YappingLexer implements FlexLexer {
   private static final int [] ZZ_ROWMAP = zzUnpackRowMap();
 
   private static final String ZZ_ROWMAP_PACKED_0 =
-    "\0\0\0\20\0\40\0\60\0\100\0\120\0\140\0\160"+
-    "\0\200\0\220\0\240\0\240\0\260\0\240\0\240\0\300"+
-    "\0\240\0\240\0\320\0\240\0\340\0\360\0\240\0\u0100"+
-    "\0\240\0\u0110\0\240\0\u0120\0\240\0\u0130\0\240\0\u0140"+
-    "\0\240\0\u0150\0\240\0\u0160\0\240\0\u0170\0\u0180\0\240"+
-    "\0\u0190\0\240\0\u01a0\0\240\0\240\0\u01b0\0\240\0\u01c0";
+    "\0\0\0\21\0\42\0\63\0\104\0\125\0\146\0\167"+
+    "\0\210\0\231\0\252\0\273\0\314\0\335\0\356\0\377"+
+    "\0\356\0\356\0\u0110\0\356\0\u0121\0\356\0\356\0\u0132"+
+    "\0\356\0\u0143\0\u0154\0\356\0\u0165\0\356\0\u0176\0\356"+
+    "\0\u0187\0\356\0\u0198\0\356\0\u01a9\0\356\0\u01ba\0\356"+
+    "\0\u01cb\0\356\0\u01dc\0\u01ed\0\356\0\u01fe\0\u020f\0\356"+
+    "\0\u0220\0\u0231\0\356\0\u0242\0\u0253\0\u0264\0\356\0\u0275"+
+    "\0\356\0\356\0\u0286\0\356\0\u0297\0\356\0\u02a8";
 
   private static int [] zzUnpackRowMap() {
-    int [] result = new int[48];
+    int [] result = new int[63];
     int offset = 0;
     offset = zzUnpackRowMap(ZZ_ROWMAP_PACKED_0, offset, result);
     return result;
@@ -407,30 +412,43 @@ class YappingLexer implements FlexLexer {
   private static final int [] ZZ_TRANS = zzUnpacktrans();
 
   private static final String ZZ_TRANS_PACKED_0 =
-    "\1\13\2\14\1\13\1\15\1\16\1\17\1\20\3\13"+
-    "\1\21\3\13\1\22\6\23\1\24\6\23\1\25\2\23"+
-    "\14\26\1\27\1\30\1\26\1\31\15\32\1\25\1\33"+
-    "\1\32\1\34\2\35\1\34\1\36\1\16\1\37\1\40"+
-    "\2\34\1\41\1\21\3\34\1\33\1\42\2\14\1\42"+
-    "\1\15\1\16\1\37\1\20\2\42\1\43\1\21\3\42"+
-    "\1\33\1\13\2\14\1\13\1\15\1\16\1\17\1\20"+
-    "\2\13\1\41\1\21\3\13\1\22\1\44\2\45\1\13"+
-    "\1\46\1\16\1\37\1\47\1\44\1\50\1\13\1\21"+
-    "\3\13\1\33\1\13\2\14\1\13\1\15\1\13\1\37"+
-    "\1\20\1\51\6\13\1\33\1\13\2\14\1\13\1\15"+
-    "\1\16\1\17\1\20\1\13\1\50\1\13\1\21\3\13"+
-    "\1\22\22\0\1\14\15\0\2\20\1\52\1\20\1\53"+
-    "\13\20\6\23\1\0\6\23\1\0\2\23\20\54\14\26"+
-    "\2\0\1\26\1\0\14\54\1\33\2\54\1\33\15\32"+
-    "\2\0\1\32\1\34\2\0\1\34\4\0\2\34\2\0"+
-    "\3\34\3\0\1\35\15\0\2\40\1\55\1\40\1\56"+
-    "\13\40\1\42\2\0\1\42\4\0\2\42\2\0\3\42"+
-    "\1\0\1\44\7\0\1\44\11\0\1\45\15\0\2\47"+
-    "\1\57\1\47\1\60\13\47\1\51\7\0\1\51\11\0"+
-    "\1\52\17\0\1\55\17\0\1\57\15\0";
+    "\1\16\2\17\1\16\1\20\1\21\1\22\1\23\1\16"+
+    "\2\24\1\25\1\26\3\16\1\27\6\30\1\31\7\30"+
+    "\1\32\2\30\15\33\1\34\1\35\1\33\1\36\16\37"+
+    "\1\32\1\40\1\37\1\41\2\42\1\41\1\43\1\21"+
+    "\1\44\1\45\2\41\1\46\1\41\1\26\3\41\1\40"+
+    "\1\47\2\17\1\47\1\20\1\24\1\44\1\23\2\47"+
+    "\1\50\1\47\1\24\3\47\1\40\1\16\2\17\1\16"+
+    "\1\20\1\21\1\22\1\23\1\16\1\24\1\46\1\25"+
+    "\1\26\3\16\1\27\1\51\2\52\1\24\1\53\1\21"+
+    "\1\44\1\54\1\51\1\55\1\24\1\51\1\26\3\24"+
+    "\1\40\1\24\2\17\1\24\1\20\1\24\1\44\1\23"+
+    "\1\56\7\24\1\40\1\16\2\17\1\16\1\20\1\21"+
+    "\1\22\1\23\1\16\1\55\1\24\1\25\1\26\3\16"+
+    "\1\27\1\57\2\60\1\57\1\61\1\21\1\44\1\62"+
+    "\1\57\1\63\1\24\1\64\1\26\3\57\1\40\1\65"+
+    "\2\17\1\65\1\20\1\24\1\44\1\23\1\65\2\24"+
+    "\1\66\1\24\3\65\1\40\1\24\2\17\1\24\1\20"+
+    "\1\21\1\24\1\23\1\24\1\63\2\24\1\26\4\24"+
+    "\1\16\2\0\1\16\4\0\1\16\4\0\3\16\24\0"+
+    "\1\17\16\0\2\23\1\67\1\23\1\70\14\23\13\0"+
+    "\1\25\5\0\6\30\1\0\7\30\1\0\2\30\21\71"+
+    "\15\33\2\0\1\33\1\0\15\71\1\40\2\71\1\40"+
+    "\16\37\2\0\1\37\1\41\2\0\1\41\4\0\2\41"+
+    "\1\0\1\41\1\0\3\41\3\0\1\42\16\0\2\45"+
+    "\1\72\1\45\1\73\14\45\1\47\2\0\1\47\4\0"+
+    "\2\47\1\0\1\47\1\0\3\47\1\0\1\51\7\0"+
+    "\1\51\2\0\1\51\7\0\1\52\16\0\2\54\1\74"+
+    "\1\54\1\75\14\54\1\56\7\0\1\56\2\0\1\56"+
+    "\5\0\1\57\2\0\1\57\4\0\1\57\2\0\1\57"+
+    "\1\0\3\57\3\0\1\60\16\0\2\62\1\76\1\62"+
+    "\1\77\14\62\1\57\2\0\1\57\4\0\1\57\2\0"+
+    "\1\64\1\0\3\57\1\0\1\65\2\0\1\65\4\0"+
+    "\1\65\4\0\3\65\14\0\1\66\7\0\1\67\20\0"+
+    "\1\72\20\0\1\74\20\0\1\76\16\0";
 
   private static int [] zzUnpacktrans() {
-    int [] result = new int[464];
+    int [] result = new int[697];
     int offset = 0;
     offset = zzUnpacktrans(ZZ_TRANS_PACKED_0, offset, result);
     return result;
@@ -468,14 +486,15 @@ class YappingLexer implements FlexLexer {
   private static final int [] ZZ_ATTRIBUTE = zzUnpackAttribute();
 
   private static final String ZZ_ATTRIBUTE_PACKED_0 =
-    "\12\0\2\11\1\1\2\11\1\1\2\11\1\1\1\11"+
-    "\2\1\1\11\1\1\1\11\1\1\1\11\1\1\1\11"+
-    "\1\1\1\11\1\1\1\11\1\1\1\11\1\1\1\11"+
-    "\2\1\1\11\1\1\1\11\1\1\2\11\1\1\1\11"+
-    "\1\1";
+    "\15\0\1\1\1\11\1\1\2\11\1\1\1\11\1\1"+
+    "\2\11\1\1\1\11\2\1\1\11\1\1\1\11\1\1"+
+    "\1\11\1\1\1\11\1\1\1\11\1\1\1\11\1\1"+
+    "\1\11\1\1\1\11\2\1\1\11\2\1\1\11\2\1"+
+    "\1\11\3\1\1\11\1\1\2\11\1\1\1\11\1\1"+
+    "\1\11\1\1";
 
   private static int [] zzUnpackAttribute() {
-    int [] result = new int[48];
+    int [] result = new int[63];
     int offset = 0;
     offset = zzUnpackAttribute(ZZ_ATTRIBUTE_PACKED_0, offset, result);
     return result;
@@ -541,17 +560,20 @@ class YappingLexer implements FlexLexer {
   /* user code: */
 // we want to handle java paths !com.user.Plugin
 // different from file paths @file/user/pugin.yap
-int CONTEXT = YYINITIAL;
-private void setFallback(int state) {
-    CONTEXT = state;
+// different from YAPPING paths { ... }.my-value.3.length
+Deque<Integer> CONTEXT = new ArrayDeque<>();
+final int GLOBAL = YYINITIAL;
+private void pushContext(int state) {
+    CONTEXT.push(state);
 }
-private int getFallback() {
-    return CONTEXT;
+private int getContext() {
+    if(CONTEXT.isEmpty())
+        return GLOBAL;
+    return CONTEXT.peek();
 }
-private int clearFallback() {
-    int prev = CONTEXT;
-    CONTEXT = YYINITIAL;
-    return prev;
+private void popContext() {
+    if(!CONTEXT.isEmpty())
+        CONTEXT.pop();
 }
 
 
@@ -868,15 +890,15 @@ private int clearFallback() {
             case LITERAL: {
               throw new Error("EOF while parsing string");
             }  // fall though
-            case 49: break;
+            case 64: break;
             case REGEX: {
               throw new Error("EOF while parsing `regex`");
             }  // fall though
-            case 50: break;
+            case 65: break;
             case REGEX_CLASS: {
               throw new Error("EOF while parsing `regex`");
             }  // fall though
-            case 51: break;
+            case 66: break;
             default:
         return null;
         }
@@ -884,133 +906,187 @@ private int clearFallback() {
       else {
         switch (zzAction < 0 ? zzAction : ZZ_ACTION[zzAction]) {
           case 1:
-            { return TokenType.BAD_CHARACTER;
+            { popContext();
+                                                        pushContext(BEFORE_YSCOPE);
+                                                        yybegin(AFTER_YSCOPE);
+                                                        return YappingTypes.YNAME;
             }
           // fall through
-          case 25: break;
+          case 34: break;
           case 2:
             { return TokenType.WHITE_SPACE;
             }
           // fall through
-          case 26: break;
+          case 35: break;
           case 3:
-            { setFallback(BEFORE_JSCOPE);
+            { pushContext(BEFORE_JSCOPE);
                                                         yybegin(AFTER_JSCOPE);
                                                         return YappingTypes.JPATH_START;
             }
           // fall through
-          case 27: break;
+          case 36: break;
           case 4:
             { // we are encountering a new literal
-                                                        clearFallback();
+                                                        popContext();
+                                                        pushContext(BEFORE_YSCOPE);
                                                         yybegin(LITERAL);
             }
           // fall through
-          case 28: break;
+          case 37: break;
           case 5:
             { return YappingTypes.COMMENT;
             }
           // fall through
-          case 29: break;
+          case 38: break;
           case 6:
+            { return TokenType.BAD_CHARACTER;
+            }
+          // fall through
+          case 39: break;
+          case 7:
+            { popContext();
+                                                        pushContext(BEFORE_YSCOPE);
+                                                        yybegin(YYINITIAL);
+                                                        return YappingTypes.NATURAL;
+            }
+          // fall through
+          case 40: break;
+          case 8:
             { /* fall back to BEFORE_SLASH when we're done parsing regex or literal */
-                                                        setFallback(BEFORE_SLASH);
+                                                        pushContext(BEFORE_SLASH);
                                                         yybegin(AFTER_SLASH);
                                                         return YappingTypes.FPATH_START;
             }
           // fall through
-          case 30: break;
-          case 7:
-            { clearFallback(); yybegin(REGEX);
-            }
-          // fall through
-          case 31: break;
-          case 8:
-            { 
-            }
-          // fall through
-          case 32: break;
-          case 9:
-            { yybegin(getFallback());
-                                                        return YappingTypes.LITERAL;
-            }
-          // fall through
-          case 33: break;
-          case 10:
-            { yybegin(REGEX_CLASS);
-            }
-          // fall through
-          case 34: break;
-          case 11:
-            { yybegin(getFallback()); return YappingTypes.REGEX;
-            }
-          // fall through
-          case 35: break;
-          case 12:
-            { yybegin(REGEX);
-            }
-          // fall through
-          case 36: break;
-          case 13:
-            { return YappingTypes.FNAME;
-            }
-          // fall through
-          case 37: break;
-          case 14:
-            { yybegin(PENDING_SLASH); return TokenType.WHITE_SPACE;
-            }
-          // fall through
-          case 38: break;
-          case 15:
-            { yybegin(LITERAL);
-            }
-          // fall through
-          case 39: break;
-          case 16:
-            { yybegin(PENDING_SLASH); return YappingTypes.COMMENT;
-            }
-          // fall through
-          case 40: break;
-          case 17:
-            { yybegin(AFTER_SLASH); return YappingTypes.SLASH;
-            }
-          // fall through
           case 41: break;
-          case 18:
-            { yybegin(BEFORE_SLASH); return YappingTypes.FNAME;
+          case 9:
+            { popContext();
+                                                        pushContext(BEFORE_YSCOPE);
+                                                        yybegin(REGEX);
             }
           // fall through
           case 42: break;
-          case 19:
-            { return YappingTypes.SLASH;
+          case 10:
+            { 
             }
           // fall through
           case 43: break;
-          case 20:
-            { return YappingTypes.JBODY;
+          case 11:
+            { yybegin(getContext());
+                                                        return YappingTypes.LITERAL;
             }
           // fall through
           case 44: break;
-          case 21:
-            { yybegin(PENDING_JSCOPE); return TokenType.WHITE_SPACE;
+          case 12:
+            { yybegin(REGEX_CLASS);
             }
           // fall through
           case 45: break;
-          case 22:
-            { yybegin(PENDING_JSCOPE); return YappingTypes.COMMENT;
+          case 13:
+            { yybegin(getContext()); return YappingTypes.REGEX;
             }
           // fall through
           case 46: break;
-          case 23:
-            { yybegin(AFTER_JSCOPE); return YappingTypes.DOT;
+          case 14:
+            { yybegin(REGEX);
             }
           // fall through
           case 47: break;
-          case 24:
-            { yybegin(BEFORE_JSCOPE); return YappingTypes.JNAME;
+          case 15:
+            { return YappingTypes.FNAME;
             }
           // fall through
           case 48: break;
+          case 16:
+            { yybegin(PENDING_SLASH); return TokenType.WHITE_SPACE;
+            }
+          // fall through
+          case 49: break;
+          case 17:
+            { yybegin(LITERAL);
+            }
+          // fall through
+          case 50: break;
+          case 18:
+            { yybegin(PENDING_SLASH); return YappingTypes.COMMENT;
+            }
+          // fall through
+          case 51: break;
+          case 19:
+            { yybegin(AFTER_SLASH); return YappingTypes.SLASH;
+            }
+          // fall through
+          case 52: break;
+          case 20:
+            { yybegin(BEFORE_SLASH); return YappingTypes.FNAME;
+            }
+          // fall through
+          case 53: break;
+          case 21:
+            { return YappingTypes.SLASH;
+            }
+          // fall through
+          case 54: break;
+          case 22:
+            { return YappingTypes.JBODY;
+            }
+          // fall through
+          case 55: break;
+          case 23:
+            { yybegin(PENDING_JSCOPE); return TokenType.WHITE_SPACE;
+            }
+          // fall through
+          case 56: break;
+          case 24:
+            { yybegin(PENDING_JSCOPE); return YappingTypes.COMMENT;
+            }
+          // fall through
+          case 57: break;
+          case 25:
+            { yybegin(AFTER_JSCOPE); return YappingTypes.DOT;
+            }
+          // fall through
+          case 58: break;
+          case 26:
+            { yybegin(BEFORE_JSCOPE); return YappingTypes.JNAME;
+            }
+          // fall through
+          case 59: break;
+          case 27:
+            { return YappingTypes.YBODY;
+            }
+          // fall through
+          case 60: break;
+          case 28:
+            { yybegin(PENDING_YSCOPE); return TokenType.WHITE_SPACE;
+            }
+          // fall through
+          case 61: break;
+          case 29:
+            { yybegin(PENDING_YSCOPE); return YappingTypes.COMMENT;
+            }
+          // fall through
+          case 62: break;
+          case 30:
+            { yybegin(AFTER_YSCOPE); return YappingTypes.DOT;
+            }
+          // fall through
+          case 63: break;
+          case 31:
+            { return YappingTypes.NATURAL;
+            }
+          // fall through
+          case 64: break;
+          case 32:
+            { yybegin(BEFORE_YSCOPE); return YappingTypes.YNAME;
+            }
+          // fall through
+          case 65: break;
+          case 33:
+            { yybegin(BEFORE_YSCOPE); return YappingTypes.NATURAL;
+            }
+          // fall through
+          case 66: break;
           default:
             zzScanError(ZZ_NO_MATCH);
           }
