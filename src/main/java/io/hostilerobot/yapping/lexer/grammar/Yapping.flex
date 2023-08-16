@@ -45,13 +45,19 @@ COMMENT        = "#"[^\r\n]*{LineTerminator}?
 FNAME          = [^\/\"\`\!\@\r\n\t\f\ \#]+
 YNAME          = [^\/\"\`\!\@\r\n\t\f\ \#\.0-9]+ // sadf-asdf asdf10
 YBODY          = [^\/\"\`\!\@\r\n\t\f\ \#\.]+    // asdf10
-//PLUS=\+
-//MINUS=\-
+PLUS=\+
+MINUS=\-
 SCOPE=\.
 NATURAL=[0-9]+
-//DECIMAL=[0-9]+\.[0-9]+
-//LIST_START=\(
-//LIST_END=\)
+DECIMAL=[0-9]+\.[0-9]+
+LIST_START=\[
+LIST_END=\]
+PRECEDENCE_START=\(
+PRECEDENCE_END=\)
+MAP_START=\{
+MAP_END=\}
+PAIR_SEP=\=
+MAP_SEP=\,
 JPATH_START=\!
 JPATH_SEP=\.
 FPATH_START=\@
@@ -66,12 +72,13 @@ REGEX_QUOTE=\`
 // YSEGMENT ::= (YNAME|NATURAL|LITERAL|REGEX) (YBODY|NATURAL|LITERAL|REGEX)*
 //%state YSEGMENT // transition here after YNAME|NATURAL|LITERAL|REGEX.
 %state BEFORE_YSCOPE, AFTER_YSCOPE, PENDING_YSCOPE
+
 %%
 
 // we have found a new identifier.
 
 // DEFAULT 1: new identifier stops previous path
-<YYINITIAL, PENDING_SLASH, PENDING_JSCOPE> {
+<YYINITIAL, PENDING_SLASH, PENDING_JSCOPE, PENDING_YSCOPE> {
     {LITERAL_QUOTE}                                 {
                                                         // we are encountering a new literal
                                                         popContext();
@@ -89,12 +96,35 @@ REGEX_QUOTE=\`
                                                         yybegin(AFTER_YSCOPE);
                                                         return YappingTypes.YNAME;
                                                     }
+    {DECIMAL}                                       {
+                                                        popContext();
+                                                        // 0.0 = asf
+                                                        // vs 0.0asdf
+//                                                        return YappingTypes.DEC
+                                                    }
+
+    {PAIR_SEP}                                      {} // x =
+    {MAP_SEP}                                       {}
+    {PLUS}                                          {}
+    {MINUS}                                         {}
     {NATURAL}                                       {
                                                         popContext();
                                                         pushContext(BEFORE_YSCOPE);
-                                                        yybegin(YYINITIAL);
+                                                        yybegin(AFTER_YSCOPE);
                                                         return YappingTypes.NATURAL;
                                                     }
+    // new identifier.
+    // Also add cases for AFTER_* and BEFORE_*
+//    {PRECEDENCE_START}                              {
+//                                                        popContext();
+////                                                        pushContext();
+//                                                        return YappingTypes.
+//                                                    }
+//    {PRECEDENCE_END}                                {}
+//    {LIST_START}                                    {}
+//    {LIST_END}                                      {}
+//    {MAP_START}                                     {}
+//    {MAP_END}                                       {}
 }
 
 // DEFAULT 2: new item detected stops previous path
@@ -141,7 +171,9 @@ REGEX_QUOTE=\`
     // other valid tokens are covered in DEFAULT 2
 }
 <BEFORE_YSCOPE> {
-    // todo - check resolution works with the following: "a."123 vs "a."123asdf
+    // note - ambiguity with the following: "a."123 vs "a."123asdf
+    //  however 123asdf will match to YBODY since it's the larger token, and
+    //  123 will match to NATURAL as it's the first listed in the program.
     {NATURAL}                                       {return YappingTypes.NATURAL;}
     {YBODY}                                         {return YappingTypes.YBODY;}
     {SCOPE}                                         {yybegin(AFTER_YSCOPE); return YappingTypes.DOT; }
@@ -150,7 +182,7 @@ REGEX_QUOTE=\`
     {WHITESPACE}                                    {yybegin(PENDING_YSCOPE); return TokenType.WHITE_SPACE;}
 }
 <BEFORE_JSCOPE> {
-    [:jletterdigit:]+                              {return YappingTypes.JBODY;}
+    [:jletterdigit:]+                               {return YappingTypes.JBODY;}
     // encountered a scope - we may now have whitespace
     {SCOPE}                                         {yybegin(AFTER_JSCOPE); return YappingTypes.DOT; }
     // pending slash - if we encounter another / we are still parsing file path. otherwise we are parsing a new item.

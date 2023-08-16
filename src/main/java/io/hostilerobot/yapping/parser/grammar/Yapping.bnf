@@ -12,20 +12,10 @@
     tokenTypeClass="io.hostilerobot.yapping.token.YappingTokenType"
 }
 
-/*
-SIGN ::= PLUS|MINUS
-INTEGER ::= SIGN? NATURAL
-*/
 yapping ::= item*
-item ::= JPATH|FPATH|YSEGMENT|COMMENT|WHITESPACE
-JPATH ::= JPATH_START spacing JSCOPE
-FPATH ::= (FPATH_START spacing FSCOPE)
+item ::= jPathC|fPathC|YSCOPE|COMMENT|WHITESPACE // |REGEX|PRECEDENCE|MAP|LIST|JPATHC|YPATHC|FPATHC -- TODO PROPERTIES top level vs in a section
 
-private JSCOPE ::= JSCOPE_SEGMENT spacing (DOT spacing JSCOPE)?
-private FSCOPE ::= FSCOPE_SEGMENT spacing (SLASH spacing FSCOPE)?
-private spacing ::= (WHITESPACE|COMMENT)*
-
-// ::JSCOPE_SEGMENT::
+// # Java Paths and Scopes
 // `[a-z]`0`[a-z]`1       x0y1
 // "asdf"0"asdf"`[a-z]`   asdf0asdfx
 // asdf"asdf"0`[a-z]`     asdfasdf0x
@@ -33,7 +23,65 @@ private spacing ::= (WHITESPACE|COMMENT)*
 // 1                      <invalid>
 // 0"asdf"                <invalid>
 // 0`[1-9]`               <invalid>
-private JSCOPE_SEGMENT ::= JSCOPE_START JSCOPE_BODY*
+
+// ## centered scope segment
+    // path where properties need to both have incipient ':' and terminator ';'
+    jPathC ::= (JPATH_START spacing jScopeC)
+    private jScopeC ::= jScopeSegmentC (spacing DOT spacing jScopeC)?
+    private jScopeSegmentC ::= (jSegmentSingleC|jSegmentMultiC)
+    // single item in the segment
+    private jSegmentSingleC ::= JNAME | containedSegment
+    // multiple items in the segment
+    private jSegmentMultiC ::= (containedSegment jSegmentInclJBodyC)
+        | (JNAME jSegmentExclJBodyC)
+    // jBody or jName cannot show up twice in a row
+    private jSegmentExclJBodyC ::= containedSegment jSegmentInclJBodyC?
+    private jSegmentInclJBodyC ::= (JBODY jSegmentExclJBodyC?)
+        | jSegmentExclJBodyC
+// ## left leaning java scope segment.
+//    We require incipient ':' to indicate we are lexing a yapping properties name, and not a java path.
+//    we only permit left leaning scope at the end of the path    (!asdf.:asdf: value;"end".:asdf: asfd.asf)
+    jPathL ::= (JPATH_START spacing jScopeL)
+    private jScopeL ::= PROPERTIESL // single item - left leaning properties (!:asdf: value).
+        | jScopePathL               // path - potentially ending in left leaning properties
+    private jScopePathL ::= jScopeSegmentC spacing DOT spacing jScopePathL // otherwise scope segment
+        | jEndSegmentL // end of the path/last item
+    private jEndSegmentL ::= (jScopeSegmentC PROPERTIESL) // path in propertiesL
+        | jScopeSegmentC // path is equivalent to using jPathC
+
+// # file paths and scopes
+// ## centered file scope element
+    fPathC ::= (FPATH_START spacing fScopeC)
+    private fScopeC ::= fScopeSegmentC (spacing SLASH spacing fScopeC)?
+    private fScopeSegmentC ::= fSegmentSingleC | fSegmentMultiC
+    private fSegmentSingleC ::= FNAME | containedSegment
+    private fSegmentMultiC ::= (containedSegment fSegmentInclFName)
+        | (FNAME fSegmentExclFName)
+    private fSegmentExclFName ::= containedSegment fSegmentInclFName?
+    private fSegmentInclFName ::= (FNAME fSegmentExclFName?)
+        | fSegmentExclFName
+// ## left leaning file scope element
+    fPathL ::= (FPATH_START spacing fScopeL)
+    private fScopeL ::= PROPERTIESL
+        | fScopePathL
+    // though we could relax rules on terminator ';' because '.' is more pervasive than '/'
+    // it still introduces problems like (@:asdf: value 3 / 4) vs (@:asdf: value 3 / 4 / path) vs (@:asdf: 3 value / 4 / path)
+    // this winds up too context-sensitive, so we just require terminator ';' if we want to end the properties in the current path
+    private fScopePathL ::= fScopeSegmentC spacing SLASH spacing fScopePathL
+        | fEndSegmentL
+    private fEndSegmentL ::= (fScopeSegmentC PROPERTIESL)
+        | fScopeSegmentC
+
+// # yapping paths and scopes
+private YSCOPE ::= YSEGMENT (spacing DOT spacing YSCOPE)?
+YSEGMENT ::= (NATURAL (YSEG_START YSEG_PART*)?)|(YNAME YSEG_PART*)|(YSEG_START YSEG_PART*)
+private YSEG_START ::= LITERAL|REGEX
+private YSEG_PART ::= (YBODY|NATURAL|LITERAL|REGEX)
+
+// all these items that can be contained in a path and have incipient and terminator chars.
+private containedSegment ::= REGEX|LITERAL|list|map|precedence|PROPERTIESC
+// spacing items
+private spacing ::= (WHITESPACE|COMMENT)*
 
 /// connect any number of paths using "asdf"+(123, 456).0+"abc"
 /**
@@ -43,36 +91,16 @@ private JSCOPE_SEGMENT ::= JSCOPE_START JSCOPE_BODY*
  * TODO - custom regex specifically for integers and indices
  * DFA for processing integers
  */
-YSEGMENT ::= (NATURAL (YSEG_START YSEG_PART*)?)|(YNAME YSEG_PART*)|(YSEG_START YSEG_PART*)
-private YSEG_START ::= LITERAL|REGEX
-private YSEG_PART ::= (YBODY|NATURAL|LITERAL|REGEX)
-// NATURAL -> LITERAL -> (ANY)
-// @`asdf`( !`asdf`asdf( sadf`asdf` ) )
-// keep a stack of items. `asdf`{ abc = ced, def = hij }"asdf"
-// {k1 = 1, v1 = 2, v3 = {x = 3, y = 3, x = 2} }.{`[kv]1` = `\<2`, "v3" = {x = `\>=3` } }
-//YSCOPE_SEGMENT ::= YINDEX_SEGMENT|YNAME_SEGMENT
-//private NAT_ALLOWED ::= (YINDEX_SEGMENT|REGEX_EXPECTED)
-//private YINDEX_SEGMENT ::= NATURAL REGEX_EXPECTED?
-//private REGEX_EXPECTED ::= REGEX NAT_ALLOWED?
-//
-//private YNAME_SEGMENT ::= YNAME_START YNAME_BODY*
-//private YNAME_START ::= (YNAME|YNAME_PART)
-//private YNAME_BODY ::= (YBODY|YNAME_PART)
-//private YNAME_PART ::= (REGEX|LITERAL)
 
-// ::FSCOPE_SEGMENT::
-// 0file.yap            "0file.yap"
-// 0"fil/e".yap         "0fil/e.yap"
-// 1`[a-z]+`.yap        "1delta.yap"
-// 0`[1-9]`               05
-// 0`[1-9]`5              015
-// 0`[1-9]``[3-5]`        093
-// 0 5                    <invalid>
-private FSCOPE_SEGMENT ::= (REGEX|FNAME|LITERAL)+
+INTEGER ::= SIGN? NATURAL
+REAL ::= (SIGN)? DECIMAL
+private SIGN ::= (PLUS|MINUS)
 
-private JSCOPE_START ::= (JNAME|JSCOPE_PART)  // JNAME cannot start with 0-9
-private JSCOPE_BODY  ::= (JBODY|JSCOPE_PART)  // but JBODY can
-private JSCOPE_PART ::= (REGEX|LITERAL)
+map ::= MAP_START MAP_END
+list ::= LIST_START LIST_END
+precedence ::= PRECEDENCE_START PRECEDENCE_END
+
+
 
 /*
 
