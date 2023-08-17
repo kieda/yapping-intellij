@@ -24,16 +24,17 @@ item ::= jPathC|fPathC|YSCOPE|COMMENT|WHITESPACE // |REGEX|PRECEDENCE|MAP|LIST|J
 // 0"asdf"                <invalid>
 // 0`[1-9]`               <invalid>
 
+// todo - Do not allow properties in paths/segments/scopes
 // ## centered scope segment
     // path where properties need to both have incipient ':' and terminator ';'
     jPathC ::= (JPATH_START spacing jScopeC)
     private jScopeC ::= jScopeSegmentC (spacing DOT spacing jScopeC)?
     private jScopeSegmentC ::= (jSegmentSingleC|jSegmentMultiC)
     // single item in the segment
-    private jSegmentSingleC ::= JNAME | containedSegment
+    private jSegmentSingleC ::= JNAME | containedSegment | PROPERTIESC // allow properties, but only if it's the only item in the segment
     // multiple items in the segment
-    private jSegmentMultiC ::= (containedSegment jSegmentInclJBodyC)
-        | (JNAME jSegmentExclJBodyC)
+    private jSegmentMultiC ::= (JNAME jSegmentExclJBodyC)
+        | (containedSegment jSegmentInclJBodyC)
     // jBody or jName cannot show up twice in a row
     private jSegmentExclJBodyC ::= containedSegment jSegmentInclJBodyC?
     private jSegmentInclJBodyC ::= (JBODY jSegmentExclJBodyC?)
@@ -43,10 +44,11 @@ item ::= jPathC|fPathC|YSCOPE|COMMENT|WHITESPACE // |REGEX|PRECEDENCE|MAP|LIST|J
 //    we only permit left leaning scope at the end of the path    (!asdf.:asdf: value;"end".:asdf: asfd.asf)
     jPathL ::= (JPATH_START spacing jScopeL)
     private jScopeL ::= PROPERTIESL // single item - left leaning properties (!:asdf: value).
+        | PROPERTIESC               // single item - centered properties (!:asdf: value;).
         | jScopePathL               // path - potentially ending in left leaning properties
     private jScopePathL ::= jScopeSegmentC spacing DOT spacing jScopePathL // otherwise scope segment
         | jEndSegmentL // end of the path/last item
-    private jEndSegmentL ::= (jScopeSegmentC PROPERTIESL) // path in propertiesL
+    private jEndSegmentL ::= PROPERTIESL // last item is propertiesL
         | jScopeSegmentC // path is equivalent to using jPathC
 
 // # file paths and scopes
@@ -54,7 +56,7 @@ item ::= jPathC|fPathC|YSCOPE|COMMENT|WHITESPACE // |REGEX|PRECEDENCE|MAP|LIST|J
     fPathC ::= (FPATH_START spacing fScopeC)
     private fScopeC ::= fScopeSegmentC (spacing SLASH spacing fScopeC)?
     private fScopeSegmentC ::= fSegmentSingleC | fSegmentMultiC
-    private fSegmentSingleC ::= FNAME | containedSegment
+    private fSegmentSingleC ::= FNAME | containedSegment | PROPERTIESC
     private fSegmentMultiC ::= (containedSegment fSegmentInclFName)
         | (FNAME fSegmentExclFName)
     private fSegmentExclFName ::= containedSegment fSegmentInclFName?
@@ -63,13 +65,14 @@ item ::= jPathC|fPathC|YSCOPE|COMMENT|WHITESPACE // |REGEX|PRECEDENCE|MAP|LIST|J
 // ## left leaning file scope element
     fPathL ::= (FPATH_START spacing fScopeL)
     private fScopeL ::= PROPERTIESL
+        | PROPERTIESC
         | fScopePathL
     // though we could relax rules on terminator ';' because '.' is more pervasive than '/'
     // it still introduces problems like (@:asdf: value 3 / 4) vs (@:asdf: value 3 / 4 / path) vs (@:asdf: 3 value / 4 / path)
     // this winds up too context-sensitive, so we just require terminator ';' if we want to end the properties in the current path
     private fScopePathL ::= fScopeSegmentC spacing SLASH spacing fScopePathL
         | fEndSegmentL
-    private fEndSegmentL ::= (fScopeSegmentC PROPERTIESL)
+    private fEndSegmentL ::= PROPERTIESL
         | fScopeSegmentC
 
 // # yapping paths and scopes
@@ -79,7 +82,7 @@ private YSEG_START ::= LITERAL|REGEX
 private YSEG_PART ::= (YBODY|NATURAL|LITERAL|REGEX)
 
 // all these items that can be contained in a path and have incipient and terminator chars.
-private containedSegment ::= REGEX|LITERAL|list|map|precedence|PROPERTIESC
+private containedSegment ::= REGEX|LITERAL|list|map|precedence
 // spacing items
 private spacing ::= (WHITESPACE|COMMENT)*
 
