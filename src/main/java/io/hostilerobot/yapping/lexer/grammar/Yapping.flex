@@ -49,7 +49,7 @@ PLUS=\+
 MINUS=\-
 SCOPE=\.
 NATURAL=[0-9]+
-DECIMAL=[0-9]+\.[0-9]+
+//DECIMAL=[0-9]+\.[0-9]+
 LIST_START=\[
 LIST_END=\]
 PRECEDENCE_START=\(
@@ -96,12 +96,12 @@ REGEX_QUOTE=\`
                                                         yybegin(AFTER_YSCOPE);
                                                         return YappingTypes.YNAME;
                                                     }
-    {DECIMAL}                                       {
+    /*{DECIMAL}                                       {
                                                         popContext();
                                                         // 0.0 = asf
                                                         // vs 0.0asdf
 //                                                        return YappingTypes.DEC
-                                                    }
+                                                    }*/
 
     {PAIR_SEP}                                      {} // x =
     {MAP_SEP}                                       {}
