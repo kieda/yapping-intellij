@@ -12,20 +12,29 @@
     tokenTypeClass="io.hostilerobot.yapping.token.YappingTokenType"
 }
 
-yapping ::= item*
+/**
+ * yapping may have items that consist of a header, then a set of properties
+ * # example
+ *   headerItem
+ *   headerItem2
+ *   123
+ *   properties:
+ *   properties2:
+ *  // goes to the end of file
+ */
+yapping ::= item* Properties? // properties ends the file
 item ::=
-    Pair|Precedence
-    |jPath|fPath|yPath1 // paths. final one is two part yapping segment
-    |ySegmentMulti // single yapping segment
+    SectionData
     |COMMENT|WHITESPACE // whitespace
-    |REGEX|LITERAL|YNAME // primitive - strings
-    |INTEGER|DECIMAL|QUOTIENT // primitive - numbers
-    |map|list|item|PropertiesC // composite data
 
+SectionData ::= Pair|TransitionL|TransitionR|BaseData
 
-
-    // |REGEX|PRECEDENCE|MAP|LIST|JPATHC|YPATHC|FPATHC -- TODO PROPERTIES top level vs in a section
-
+BaseData ::= Precedence // (x)
+    |Map|List   // composite data
+    |jPath|fPath|yPath1 // paths. final path is a two part or more yapping segment
+    |ySegmentMulti  // single yapping segment (not a path)
+    |REGEX|LITERAL|YNAME // primitive - string types
+    |QUOTIENT|INTEGER|REAL  // primitive - numbers
 // # Java Paths and Scopes
 // `[a-z]`0`[a-z]`1       x0y1
 // "asdf"0"asdf"`[a-z]`   asdf0asdfx
@@ -83,11 +92,15 @@ item ::=
     // -1.0.123
 
 // all these items that can be contained in a path and have incipient and terminator chars.
-private containedSegment ::= REGEX|LITERAL|list|map|precedence
+private containedSegment ::= REGEX|LITERAL|List|Map|Precedence
+// asdf10&3/4 vs "asdf"10 & 3/4"asdf"
 // spacing items
 private spacing ::= (WHITESPACE|COMMENT)*
 
+// possible -
 /// connect any number of paths using "asdf"+(123, 456).0+"abc"
+// current -
+// connect paths by not having whitespace
 /**
  * y = [1, 2, 3, 4]
  * y`k v~k<`(y.len.`~/2`)
@@ -96,102 +109,34 @@ private spacing ::= (WHITESPACE|COMMENT)*
  * DFA for processing integers
  */
 
-INTEGER ::= SIGN? NATURAL
-REAL ::= (SIGN)? DECIMAL
-DECIMAL ::= (SIGN)? spacing NATURAL DOT NATURAL // define DECIMAL in parser rather than lexer, as this might be part of a ysegment rather than a decimal
+QUOTIENT ::= (INTEGER spacing) AND INTEGER spacing SLASH spacing NATURAL // 1 & 3/4, -1 &3/4, +1 & -3/4.
+INTEGER ::= (SIGN spacing)? NATURAL
+REAL ::= (SIGN spacing)? DECIMAL
+DECIMAL ::= NATURAL DOT NATURAL // define DECIMAL in parser rather than lexer, as this might be part of a ysegment rather than a decimal
 private SIGN ::= (PLUS|MINUS)
 
-map ::= MAP_START MAP_END
-list ::= LIST_START LIST_END
-precedence ::= PRECEDENCE_START PRECEDENCE_END
+// properties is just
+//     name1 : value1a value1b
+//     name2 : value2a value2b value2c
+// to nest properties, we use precedence
+//     name1 : value1a value1b
+//     (name2 : value2a value2b) value2c
+Properties ::= (BaseData spacing PROPERTY_SEP item*)+
 
+Map ::= (MAP_START spacing MAP_END) // {}
+    // { a = b[, c = d]* }
+    | (MAP_START spacing PairBounded (spacing LIST_SEP spacing PairBounded)* spacing MAP_END)
+List ::= (LIST_START LIST_END) // []
+    // [a[, b]*]
+    | LIST_START spacing BoundedData (spacing LIST_SEP spacing BoundedData)* spacing LIST_END
+Precedence ::= PRECEDENCE_START spacing BoundedData spacing PRECEDENCE_END
 
+Pair ::= (BaseData|TransitionL|TransitionR) spacing PAIR_SEP spacing (BaseData|Pair|TransitionL|TransitionR){rightAssociative=true} // default pair. sectiona: x = y sectionb: asdf
+PairBounded ::= (BaseData|TransitionL|TransitionR) spacing PAIR_SEP spacing BoundedData{rightAssociative=true} // pair that may end in properties. (x = y = section: lol)
+// A -> B <- A -> B =
+TransitionL ::= (BaseData|TransitionR) spacing TRANSITION_SEP_L spacing (BaseData|TransitionL|TransitionR){rightAssociative=true}
+TransitionLBounded ::= (BaseData|TransitionR) spacing TRANSITION_SEP_L spacing (Properties|TransitionLBounded|TransitionRBounded|BaseData){rightAssociative=true}
+TransitionR ::= BaseData spacing TRANSITION_SEP_R spacing (BaseData|TransitionR){rightAssociative=true}
+TransitionRBounded ::= BaseData spacing TRANSITION_SEP_R spacing (Properties|TransitionRBounded|BaseData){rightAssociative=true}
 
-/*
-
-FRACTION ::= (SIGN? NATURAL)? SIGN? NATURAL FRACTION_SEP NATURAL
-private PRIMITIVE ::= (DECIMAL|INTEGER|REGEX|NAME|LITERAL|FRACTION)
-*/
-
-/*
-BASE_DATA ::= (LIST|PRIMITIVE)
-SECTION_DATA ::= (BASE_DATA|CPROPERTIES|PAIR)
-private LIST_DATA ::= (BASE_DATA|APROPERTIES|PAIR)
-LIST ::= LIST_START LIST_END
-    | LIST_START LIST_DATA (LIST_ITEM_SEP LIST_DATA)* LIST_END
-
-SECTION_KEY ::=
-    (BASE_DATA|CPROPERTIES) SCOPE|LIST|JSCOPE_SEGMENT
-SECTION_BODY ::= SECTION_DATA*
-
-MPROPERTIES ::= (SECTION_KEY PROPERTIES_SEP SECTION_BODY)+
-APROPERTIES ::= PROPERTIES_SEP? MPROPERTIES PROPERTIES_SEP?
-CPROPERTIES ::= PROPERTIES_SEP MPROPERTIES PROPERTIES_SEP
-LPROPERTIES ::= PROPERTIES_SEP MPROPERTIES PROPERTIES_SEP? // left is required
-RPROPERTIES ::= PROPERTIES_SEP? MPROPERTIES PROPERTIES_END // right is required
-SCOPE ::= DOT (JSCOPE_SEGMENT | INDEX_RESOLUTION)\
-*/
-// want: an arbitrary expression that evaluates to a list or an environment
-// what thing are possible?
-// (MAP).scope
-// properties.scope
-// :properties;.scope
-// properties;.scope
-// :properties.scope    -- does not work. must be right leaning
-/*
-private PAIR_KEY_DATA ::= (RPROPERTIES|BASE_DATA)
-private PAIR_VAL_DATA ::= LIST_DATA
-PAIR ::= PAIR_KEY_DATA PAIR_SEP PAIR_VAL_DATA
-
-MAP ::= MAP_START
-
-        MAP_END
-
- */
-// section:
-//    NAME|(...)
-
-
-
-//    // whitespace, bad char
-//    public static final IElementType WHITE_SPACE = TokenType.WHITE_SPACE;
-//    public static final IElementType BAD_CHARACTER = TokenType.BAD_CHARACTER;
-//
-//    // comments
-//    public static final IElementType COMMENT = new YappingElementType("COMMENT");
-//    // primitives
-//    public static final IElementType DECIMAL = new YappingElementType("DECIMAL");  // has the form \d+.\d+
-//    public static final IElementType INTEGER = new YappingElementType("INTEGER");  // has the form \d+
-//    public static final IElementType REGEX = new YappingElementType("REGEX");      // has the form `regex~flags`
-//    public static final IElementType NAME = new YappingElementType("NAME");        // has the form \w+
-//    public static final IElementType LITERAL = new YappingElementType("LITERAL");  // has the form "[^"]*"
-//    public static final IElementType FRACTION = new YappingElementType("FRACTION");// has the form INTEGER / INTEGER
-//
-//    // sections
-//    public static final IElementType SECTION_START = new YappingElementType("SECTION_START"); // : in :name
-//    public static final IElementType SECTION_SEP = new YappingElementType("SECTION_SEP");     // : in name:
-//    public static final IElementType SECTION_END = new YappingElementType("SECTION_END");         // ;
-//
-//    // lists
-//    public static final IElementType LIST_START = new YappingElementType("LIST_START"); // (
-//    public static final IElementType LIST_ITEM = new YappingElementType("LIST_ITEM");   // ,
-//    public static final IElementType LIST_END = new YappingElementType("LIST_END");     // )
-//
-//    // maps
-//    public static final IElementType MAP_START = new YappingElementType("MAP_START"); // {
-//    public static final IElementType MAP_SEP = new YappingElementType("MAP_SEP");     // =
-//    public static final IElementType MAP_ITEM = new YappingElementType("MAP_ITEM");   // ,
-//    public static final IElementType MAP_END = new YappingElementType("MAP_END");     // }
-//
-//    // pairs
-//    public static final IElementType PAIR_SEP = new YappingElementType("PAIR_SEP");   // =
-//
-//    // scopes and lookups
-//    public static final IElementType SCOPE = new YappingElementType("SCOPE");               // "."
-//    public static final IElementType LOOKUP_BEGIN = new YappingElementType("LOOKUP_BEGIN"); // "["
-//    public static final IElementType LOOKUP_END = new YappingElementType("LOOKUP_END");     // "]"
-//
-//    // paths. File path preceded by "!" and uses "/" as a separator
-//    //        Java path preceded by "@" and uses "." as a separator
-//    public static final IElementType FILE_PATH = new YappingElementType("FILE_PATH");
-//    public static final IElementType JAVA_PATH = new YappingElementType("JAVA_PATH");
+BoundedData ::= Properties|PairBounded|TransitionLBounded|TransitionRBounded|BaseData // data that is surrounded by bounds

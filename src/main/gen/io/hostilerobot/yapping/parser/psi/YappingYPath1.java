@@ -5,7 +5,7 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface YappingJPath extends PsiElement {
+public interface YappingYPath1 extends PsiElement {
 
   @NotNull
   List<YappingList> getListList();
@@ -15,5 +15,8 @@ public interface YappingJPath extends PsiElement {
 
   @NotNull
   List<YappingPrecedence> getPrecedenceList();
+
+  @NotNull
+  List<YappingQuotient> getQuotientList();
 
 }

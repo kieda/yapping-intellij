@@ -3,7 +3,7 @@ package io.hostilerobot.yapping.lexer;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.TokenType;
 
-import io.hostilerobot.yapping.parser.YappingTypes;import java.util.ArrayDeque;import java.util.Deque;
+import io.hostilerobot.yapping.parser.YappingTypes;import java.util.ArrayDeque;import java.util.Deque;import com.intellij.lexer.FlexLexer;
 
 %%
 
@@ -42,14 +42,17 @@ LineTerminator = \r|\n|\r\n
 InputCharacter = [^\r\n\t\f\ \#]
 WHITESPACE     = {LineTerminator} | [ \t\f]
 COMMENT        = "#"[^\r\n]*{LineTerminator}?
-FNAME          = [^\/\"\`\!\@\r\n\t\f\ \#]+
-YNAME          = [^\/\"\`\!\@\r\n\t\f\ \#\.0-9]+ // sadf-asdf asdf10
-YBODY          = [^\/\"\`\!\@\r\n\t\f\ \#\.]+    // asdf10
+FNAMECHAR      = [^\/\"\`\!\@\r\n\t\f\ \#\[\]\(\)\{\}\<\>]
+FNAME          = {FNAMECHAR}+
+YFIRSTCHAR     = [^\/\"\'\`\!\@\r\n\t\f\ \#\[\]\(\)\{\}\<\>\:\&\-\+\;\|\=\,\~\*\^\%\\\?\%\.[0-9]]
+YBODYCHAR      = [^\/\"\'\`\!\@\r\n\t\f\ \#\[\]\(\)\{\}\<\>\:\&\-\+\;\|\=\,\~\*\^\%\\\?\%\.]
+YBODY          = {YBODYCHAR}+    // asdf10
+YNAME          = {YFIRSTCHAR}({YBODYCHAR}*) // sadf-asdf asdf10
 PLUS=\+
 MINUS=\-
-SCOPE=\.
+DOT=\.
 NATURAL=[0-9]+
-//DECIMAL=[0-9]+\.[0-9]+
+AND=\&
 LIST_START=\[
 LIST_END=\]
 PRECEDENCE_START=\(
@@ -57,20 +60,20 @@ PRECEDENCE_END=\)
 MAP_START=\{
 MAP_END=\}
 PAIR_SEP=\=
-MAP_SEP=\,
+LIST_SEP=\,
 JPATH_START=\!
-JPATH_SEP=\.
 FPATH_START=\@
-FPATH_SEP=\/
+SLASH=\/
+PROPERTY_SEP=\:
 LITERAL_QUOTE=\"
 REGEX_QUOTE=\`
+TRANSITION_SEP_L="<-"
+TRANSITION_SEP_R="->"
 %state LITERAL
 %state REGEX
 %state REGEX_CLASS
 %state BEFORE_SLASH, AFTER_SLASH, PENDING_SLASH
 %state BEFORE_JSCOPE, AFTER_JSCOPE, PENDING_JSCOPE
-// YSEGMENT ::= (YNAME|NATURAL|LITERAL|REGEX) (YBODY|NATURAL|LITERAL|REGEX)*
-//%state YSEGMENT // transition here after YNAME|NATURAL|LITERAL|REGEX.
 %state BEFORE_YSCOPE, AFTER_YSCOPE, PENDING_YSCOPE
 
 %%
@@ -96,17 +99,48 @@ REGEX_QUOTE=\`
                                                         yybegin(AFTER_YSCOPE);
                                                         return YappingTypes.YNAME;
                                                     }
-    /*{DECIMAL}                                       {
-                                                        popContext();
-                                                        // 0.0 = asf
-                                                        // vs 0.0asdf
-//                                                        return YappingTypes.DEC
-                                                    }*/
-
-    {PAIR_SEP}                                      {} // x =
-    {MAP_SEP}                                       {}
-    {PLUS}                                          {}
-    {MINUS}                                         {}
+    {NATURAL}                                       {
+                                                        return YappingTypes.NATURAL;
+                                                    }
+    {AND}                                           {
+                                                        return YappingTypes.AND;
+                                                    }
+    {PLUS}                                          {
+                                                        return YappingTypes.PLUS;
+                                                    }
+    {MINUS}                                         {
+                                                        return YappingTypes.MINUS;
+                                                    }
+    {MAP_START}                                     {
+                                                        return YappingTypes.MAP_START;
+                                                    }
+    {MAP_END}                                       {
+                                                        return YappingTypes.MAP_END;
+                                                    }
+    {PAIR_SEP}                                      {
+                                                        return YappingTypes.PAIR_SEP;
+                                                    }
+    {LIST_START}                                    {
+                                                        return YappingTypes.LIST_START;
+                                                    }
+    {LIST_END}                                      {
+                                                        return YappingTypes.LIST_END;
+                                                    }
+    {LIST_SEP}                                      {
+                                                        return YappingTypes.LIST_SEP;
+                                                    }
+    {PRECEDENCE_START}                              {
+                                                        return YappingTypes.PRECEDENCE_START;
+                                                    }
+    {PRECEDENCE_END}                                {
+                                                        return YappingTypes.PRECEDENCE_END;
+                                                    }
+    {PLUS}                                          {
+                                                        return YappingTypes.PLUS;
+                                                    }
+    {MINUS}                                         {
+                                                        return YappingTypes.MINUS;
+                                                    }
     {NATURAL}                                       {
                                                         popContext();
                                                         pushContext(BEFORE_YSCOPE);
@@ -115,16 +149,6 @@ REGEX_QUOTE=\`
                                                     }
     // new identifier.
     // Also add cases for AFTER_* and BEFORE_*
-//    {PRECEDENCE_START}                              {
-//                                                        popContext();
-////                                                        pushContext();
-//                                                        return YappingTypes.
-//                                                    }
-//    {PRECEDENCE_END}                                {}
-//    {LIST_START}                                    {}
-//    {LIST_END}                                      {}
-//    {MAP_START}                                     {}
-//    {MAP_END}                                       {}
 }
 
 // DEFAULT 2: new item detected stops previous path
@@ -164,7 +188,7 @@ REGEX_QUOTE=\`
     {FNAME}                                         {return YappingTypes.FNAME;}
 
     // encountered a slash - we may now have whitespace
-    {FPATH_SEP}                                     {yybegin(AFTER_SLASH); return YappingTypes.SLASH; }
+    {SLASH}                                         {yybegin(AFTER_SLASH); return YappingTypes.SLASH; }
     // pending slash - if we encounter another / we are still parsing file path. otherwise we are parsing a new item.
     {COMMENT}                                       {yybegin(PENDING_SLASH); return YappingTypes.COMMENT;}
     {WHITESPACE}                                    {yybegin(PENDING_SLASH); return TokenType.WHITE_SPACE;}
@@ -176,7 +200,7 @@ REGEX_QUOTE=\`
     //  123 will match to NATURAL as it's the first listed in the program.
     {NATURAL}                                       {return YappingTypes.NATURAL;}
     {YBODY}                                         {return YappingTypes.YBODY;}
-    {SCOPE}                                         {yybegin(AFTER_YSCOPE); return YappingTypes.DOT; }
+    {DOT}                                           {yybegin(AFTER_YSCOPE); return YappingTypes.DOT; }
      // pending scope - if we encounter another . we are still parsing path. otherwise we are parsing a new item.
     {COMMENT}                                       {yybegin(PENDING_YSCOPE); return YappingTypes.COMMENT;}
     {WHITESPACE}                                    {yybegin(PENDING_YSCOPE); return TokenType.WHITE_SPACE;}
@@ -184,7 +208,7 @@ REGEX_QUOTE=\`
 <BEFORE_JSCOPE> {
     [:jletterdigit:]+                               {return YappingTypes.JBODY;}
     // encountered a scope - we may now have whitespace
-    {SCOPE}                                         {yybegin(AFTER_JSCOPE); return YappingTypes.DOT; }
+    {DOT}                                         {yybegin(AFTER_JSCOPE); return YappingTypes.DOT; }
     // pending slash - if we encounter another / we are still parsing file path. otherwise we are parsing a new item.
     {COMMENT}                                       {yybegin(PENDING_JSCOPE); return YappingTypes.COMMENT;}
     {WHITESPACE}                                    {yybegin(PENDING_JSCOPE); return TokenType.WHITE_SPACE;}
@@ -203,7 +227,7 @@ REGEX_QUOTE=\`
 }
 <AFTER_SLASH> {
     // file//asdf is fine
-    {FPATH_SEP}                                     {return YappingTypes.SLASH;}
+    {SLASH}                                         {return YappingTypes.SLASH;}
     {FNAME}                                         {yybegin(BEFORE_SLASH); return YappingTypes.FNAME;}
     // however we do require a name at the end, a dangling / is invalid (and can cause confusion)
     // e.g.        @my/folder/
@@ -223,14 +247,14 @@ REGEX_QUOTE=\`
 }
 <PENDING_SLASH> {
     // before a path separator, comments and whitespaces separate to next item
-    {FPATH_SEP}                                     {yybegin(AFTER_SLASH); return YappingTypes.SLASH; }
+    {SLASH}                                     {yybegin(AFTER_SLASH); return YappingTypes.SLASH; }
     // other valid tokens are covered in DEFAULT 1
 }
 <PENDING_YSCOPE> {
-    {SCOPE}                                         {yybegin(AFTER_YSCOPE); return YappingTypes.DOT; }
+    {DOT}                                         {yybegin(AFTER_YSCOPE); return YappingTypes.DOT; }
 }
 <PENDING_JSCOPE> {
-    {SCOPE}                                         {yybegin(AFTER_JSCOPE); return YappingTypes.DOT; }
+    {DOT}                                         {yybegin(AFTER_JSCOPE); return YappingTypes.DOT; }
 }
 <LITERAL> {
     // escaped quote in string

@@ -11,14 +11,14 @@ import static io.hostilerobot.yapping.parser.YappingTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import io.hostilerobot.yapping.parser.psi.*;
 
-public class YappingItemImpl extends ASTWrapperPsiElement implements YappingItem {
+public class YappingPropertiesImpl extends ASTWrapperPsiElement implements YappingProperties {
 
-  public YappingItemImpl(@NotNull ASTNode node) {
+  public YappingPropertiesImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull YappingVisitor visitor) {
-    visitor.visitItem(this);
+    visitor.visitProperties(this);
   }
 
   @Override
@@ -28,9 +28,15 @@ public class YappingItemImpl extends ASTWrapperPsiElement implements YappingItem
   }
 
   @Override
-  @Nullable
-  public YappingSectionData getSectionData() {
-    return findChildByClass(YappingSectionData.class);
+  @NotNull
+  public List<YappingBaseData> getBaseDataList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, YappingBaseData.class);
+  }
+
+  @Override
+  @NotNull
+  public List<YappingItem> getItemList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, YappingItem.class);
   }
 
 }
