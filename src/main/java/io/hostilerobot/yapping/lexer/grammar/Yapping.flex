@@ -3,7 +3,7 @@ package io.hostilerobot.yapping.lexer;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.TokenType;
 
-import io.hostilerobot.yapping.parser.YappingTypes;import java.util.ArrayDeque;import java.util.Deque;import com.intellij.lexer.FlexLexer;
+import io.hostilerobot.yapping.parser.YappingTypes;import java.nio.file.Path;import java.util.ArrayDeque;import java.util.Deque;import com.intellij.lexer.FlexLexer;
 
 %%
 
@@ -17,37 +17,169 @@ import io.hostilerobot.yapping.parser.YappingTypes;import java.util.ArrayDeque;i
 %line
 %column
 %{
+
+enum PathContext{
+      FILE(AFTER_SLASH, BEFORE_SLASH),
+      JAVA(AFTER_JSCOPE, BEFORE_JSCOPE),
+      YAPPING(YYINITIAL, YYINITIAL);
+      private final int fallback;
+      private final int initialState;
+      PathContext(int initialState, int fallback) {
+          this.initialState = initialState;
+          this.fallback = fallback;
+      }
+}
 // we want to handle java paths !com.user.Plugin
 // different from file paths @file/user/pugin.yap
 // different from YAPPING paths { ... }.my-value.3.length
-Deque<Integer> CONTEXT = new ArrayDeque<>();
-final int GLOBAL = YYINITIAL;
-private void pushContext(int state) {
-    CONTEXT.push(state);
+//Deque<Integer> CONTEXT = new ArrayDeque<>();
+private Deque<PathContext> context = new ArrayDeque<>();
+{
+  // top level is all yapping
+  // this item should be here throughout all lexing
+  context.push(PathContext.YAPPING);
 }
-private int getContext() {
-    if(CONTEXT.isEmpty())
-        return GLOBAL;
-    return CONTEXT.peek();
+
+private int getCurrentFallback() {
+    return context.peek().fallback;
 }
-private void popContext() {
-    if(!CONTEXT.isEmpty())
-        CONTEXT.pop();
+// file path interrupts the current segment and starts a new one that's file
+// @asdf!asdf asdf!asdf !asdf !asdf
+private void startNewFilePath() {
+    endCurrentPath();
+    context.push(PathContext.FILE);
+    yybegin(PathContext.FILE.initialState);
+}
+private void startNewJavaPath() {
+    endCurrentPath();
+    context.push(PathContext.JAVA);
+    yybegin(PathContext.JAVA.initialState);
+}
+
+// new path that starts with a regex
+private void startNewYappingPathRegexStart() {
+    endCurrentPath();
+    yybegin(REGEX);
+}
+// new path that starts with a literal
+// !asdf "asdf"
+//       ^
+private void startNewYappingPathLiteralStart() {
+    endCurrentPath();
+    yybegin(LITERAL);
+}
+
+// open parentheses on a new yapping path, e.g. [ ( {
+// asdf ( .. )
+//      ^
+// !asdf ( .. )
+//       ^
+private void startNewYappingPathOpenStart() {
+    startNewYappingPath();
+    context.push(PathContext.YAPPING);
+}
+
+// asdf asdf
+//      ^
+// !asdf asdf
+//       ^
+// !asdf=asdf
+//      ^
+// @asdf, asdf
+//      ^
+private void startNewYappingPath() {
+    endCurrentPath();
+    yybegin(YYINITIAL);
+}
+
+// ends the current segment
+private void endCurrentPath() {
+    // encounter a start of a new yapping segment after PENDING
+    if(context.size() > 1 && context.peek() != PathContext.YAPPING) {
+        // !asdf.asdf asdf
+        // [F, Y]     [Y]
+        context.pop();
+        if(context.peek() != PathContext.YAPPING) {
+            // should never happen but we check anyway
+            throw new IllegalStateException("Expected YAPPING instead found " + context.peek());
+        }
+    }
+}
+
+private void openYappingSegment() {
+    // encounter a (, {, or [ while in a segment
+    context.push(PathContext.YAPPING);
+    if(yystate() != PathContext.YAPPING.initialState) {
+        yybegin(PathContext.YAPPING.initialState);
+    }
+}
+private void closeCurrentSegment() {
+    // encounter ), ], or }
+    if(context.size() > 1 && context.peek() == PathContext.YAPPING) {
+        context.pop();
+        // !sadf[asdf]
+        //           ^
+        // sadf[[asdf]]
+        //           ^^
+        PathContext contextResult = context.peek();
+        yybegin(contextResult.fallback);
+    } else if(context.size() > 2 && context.peek() != PathContext.YAPPING) {
+        // !sa/df[!asdf]as/df
+        //             ^
+        context.pop(); // stop the current java or file path
+        // context.size() > 1
+        if(context.peek() != PathContext.YAPPING) {
+            // should never happen but we check anyway
+            throw new IllegalStateException("Expected YAPPING instead found " + context.peek());
+        }
+        // remove this context - it corresponds to the opening brace which has now just ended
+        context.pop();
+        // context.size() > 0
+
+        PathContext contextResult = context.peek();
+        // we return to this context
+        yybegin(contextResult.fallback);
+    } else {
+        // will only occur if we have a sequence with
+        // sadf] or !asdf]
+        if(context.size() > 1) {
+            context.pop();
+        }
+        yybegin(PathContext.YAPPING.fallback);
+    }
+    // todo - should we throw if we encounter mismatched segments?
+    //        ex: asdf)asdf
+    //        currently we just fall back to YAPPING and let the parser deal with it
 }
 %}
 
 %eof{  return;
 %eof}
 LineTerminator = \r|\n|\r\n
-InputCharacter = [^\r\n\t\f\ \#]
+//InputCharacter = [^\r\n\t\f\ \#]
 WHITESPACE     = {LineTerminator} | [ \t\f]
 COMMENT        = "#"[^\r\n]*{LineTerminator}?
-FNAMECHAR      = [^\/\"\`\!\@\r\n\t\f\ \#\[\]\(\)\{\}\<\>]
-FNAME          = {FNAMECHAR}+
-YFIRSTCHAR     = [^\/\"\'\`\!\@\r\n\t\f\ \#\[\]\(\)\{\}\<\>\:\&\-\+\;\|\=\,\~\*\^\%\\\?\%\.[0-9]]
-YBODYCHAR      = [^\/\"\'\`\!\@\r\n\t\f\ \#\[\]\(\)\{\}\<\>\:\&\-\+\;\|\=\,\~\*\^\%\\\?\%\.]
-YBODY          = {YBODYCHAR}+    // asdf10
-YNAME          = {YFIRSTCHAR}({YBODYCHAR}*) // sadf-asdf asdf10
+
+FNAMECHAR      = [^\/\"\`\!\@\,\r\n\t\f\=\-\:\;\ \#\[\]\(\)\{\}\<\>]
+// permit hyphens in file names, but stop short of "->"
+// (asf-adf-)/
+// (asf-adf)->
+// (asf-adf-)->
+// last segment matches - but not ->
+// ({FNAMECHAR}|\-)+ "->"
+// ({FNAMECHAR}|\-)+ "-----"->
+FNAME          = !(!(({FNAMECHAR}|\-)+)|(({FNAMECHAR}|\-) "->"))
+//({FNAMECHAR}|(\-({FNAMECHAR}|\-)))+ (!(!\-|{TRANSITION_SEP_R}))?
+// !{FNAMECHAR} = a [\/\"\`\!\@\r\n\t\f\-\ \#\[\]\(\)\{\}\<\>] [^]*
+//
+YBODYCHAR      = //[[{FNAMECHAR}] && [^\&\+\'\$\|\~\*\^\%\\\?\%\.]]
+    [^\/\"\`\!\@\,\r\n\t\f\=\-\:\;\ \#\[\]\(\)\{\}\<\>\&\+\'\$\|\~\*\^\%\\\?\%\.];
+YFIRSTCHAR     = //[{YFIRSTCHAR} && [^0-9]]
+    [^\/\"\`\!\@\,\r\n\t\f\=\-\:\;\ \#\[\]\(\)\{\}\<\>\&\+\'\$\|\~\*\^\%\\\?\%\.0-9]
+//YFIRSTCHAR     = [^\/\"\'\`\!\@\r\n\t\f\ \#\[\]\(\)\{\}\<\>\:\&\+\;\|\=\,\~\*\^\%\\\?\%\.[0-9]]
+//YBODYCHAR      = [^\/\"\'\`\!\@\r\n\t\f\ \#\[\]\(\)\{\}\<\>\:\&\-\+\;\|\=\,\~\*\^\%\\\?\%\.]
+YBODY          = ({YBODYCHAR})+    // asdf10hij
+YNAME          = {YFIRSTCHAR}({YBODYCHAR}*) // sadfasdf asdf10
 PLUS=\+
 MINUS=\-
 DOT=\.
@@ -74,115 +206,146 @@ TRANSITION_SEP_R="->"
 %state REGEX_CLASS
 %state BEFORE_SLASH, AFTER_SLASH, PENDING_SLASH
 %state BEFORE_JSCOPE, AFTER_JSCOPE, PENDING_JSCOPE
-%state BEFORE_YSCOPE, AFTER_YSCOPE, PENDING_YSCOPE
+//  %state BEFORE_YSCOPE, AFTER_YSCOPE, PENDING_YSCOPE
 
 %%
 
 // we have found a new identifier.
 
 // DEFAULT 1: new identifier stops previous path
-<YYINITIAL, PENDING_SLASH, PENDING_JSCOPE, PENDING_YSCOPE> {
+<PENDING_SLASH, PENDING_JSCOPE> {
     {LITERAL_QUOTE}                                 {
                                                         // we are encountering a new literal
-                                                        popContext();
-                                                        pushContext(BEFORE_YSCOPE);
-                                                        yybegin(LITERAL);
+                                                        startNewYappingPathLiteralStart();
                                                     }
     {REGEX_QUOTE}                                   {
-                                                        popContext();
-                                                        pushContext(BEFORE_YSCOPE);
-                                                        yybegin(REGEX);
+                                                        startNewYappingPathRegexStart();
                                                     }
     {YNAME}                                         {
-                                                        popContext();
-                                                        pushContext(BEFORE_YSCOPE);
-                                                        yybegin(AFTER_YSCOPE);
+                                                        startNewYappingPath();
                                                         return YappingTypes.YNAME;
                                                     }
     {NATURAL}                                       {
+                                                        startNewYappingPath();
                                                         return YappingTypes.NATURAL;
                                                     }
-    {AND}                                           {
-                                                        return YappingTypes.AND;
-                                                    }
-    {PLUS}                                          {
-                                                        return YappingTypes.PLUS;
-                                                    }
-    {MINUS}                                         {
-                                                        return YappingTypes.MINUS;
-                                                    }
     {MAP_START}                                     {
+                                                        startNewYappingPathOpenStart();
                                                         return YappingTypes.MAP_START;
                                                     }
     {MAP_END}                                       {
+                                                        closeCurrentSegment();
                                                         return YappingTypes.MAP_END;
                                                     }
-    {PAIR_SEP}                                      {
-                                                        return YappingTypes.PAIR_SEP;
-                                                    }
     {LIST_START}                                    {
+                                                        startNewYappingPathOpenStart();
                                                         return YappingTypes.LIST_START;
                                                     }
     {LIST_END}                                      {
+                                                        closeCurrentSegment();
                                                         return YappingTypes.LIST_END;
                                                     }
-    {LIST_SEP}                                      {
-                                                        return YappingTypes.LIST_SEP;
-                                                    }
     {PRECEDENCE_START}                              {
+                                                        startNewYappingPathOpenStart();
                                                         return YappingTypes.PRECEDENCE_START;
                                                     }
     {PRECEDENCE_END}                                {
+                                                        closeCurrentSegment();
                                                         return YappingTypes.PRECEDENCE_END;
                                                     }
-    {PLUS}                                          {
-                                                        return YappingTypes.PLUS;
-                                                    }
-    {MINUS}                                         {
-                                                        return YappingTypes.MINUS;
-                                                    }
-    {NATURAL}                                       {
-                                                        popContext();
-                                                        pushContext(BEFORE_YSCOPE);
-                                                        yybegin(AFTER_YSCOPE);
-                                                        return YappingTypes.NATURAL;
-                                                    }
-    // new identifier.
-    // Also add cases for AFTER_* and BEFORE_*
 }
 
-// DEFAULT 2: new item detected stops previous path
-<YYINITIAL, PENDING_SLASH, BEFORE_SLASH, PENDING_JSCOPE, BEFORE_JSCOPE, BEFORE_YSCOPE, PENDING_YSCOPE> {
+// DEFAULT 2: new java|file path stops previous path
+//            and binary operators: items that may end the current path
+<YYINITIAL, PENDING_SLASH, BEFORE_SLASH, PENDING_JSCOPE, BEFORE_JSCOPE> {
     {FPATH_START}                                   {
                                                         /* fall back to BEFORE_SLASH when we're done parsing regex or literal */
-                                                        pushContext(BEFORE_SLASH);
-                                                        yybegin(AFTER_SLASH);
+                                                        startNewFilePath();
                                                         return YappingTypes.FPATH_START;
                                                     }
     {JPATH_START}                                   {
-                                                        pushContext(BEFORE_JSCOPE);
-                                                        yybegin(AFTER_JSCOPE);
+                                                        startNewJavaPath();
                                                         return YappingTypes.JPATH_START;
                                                     }
+    {TRANSITION_SEP_L}                              {
+                                                        startNewYappingPath();
+                                                        return YappingTypes.TRANSITION_SEP_L;
+                                                    }
+    {TRANSITION_SEP_R}                              {
+                                                        startNewYappingPath();
+                                                        return YappingTypes.TRANSITION_SEP_R;
+                                                    }
+    {PAIR_SEP}                                      {
+                                                        startNewYappingPath();
+                                                        return YappingTypes.PAIR_SEP;
+                                                    }
+    {LIST_SEP}                                      {
+                                                        startNewYappingPath();
+                                                        return YappingTypes.LIST_SEP;
+                                                    }
+    {PROPERTY_SEP}                                  {
+                                                        startNewYappingPath();
+                                                        return YappingTypes.PROPERTY_SEP;
+                                                    }
 }
-
-// DEFAULT 3: whitespace and comments at top-level
+// DEFAULT 3: whitespace, comments, etc in yapping context
 <YYINITIAL> {
     {COMMENT}                                       { return YappingTypes.COMMENT; }
     {WHITESPACE}                                    { return TokenType.WHITE_SPACE; }
-    /*{PLUS}                                          { yybegin(YYINITIAL); return YappingTypes.PLUS; }
-    {MINUS}                                         { yybegin(YYINITIAL); return YappingTypes.MINUS; }
-    {NATURAL}                                       { yybegin(YYINITIAL); return YappingTypes.NATURAL; }
-    {DECIMAL}                                       { yybegin(YYINITIAL); return YappingTypes.DECIMAL; }
-    {LIST_START}                                    { yybegin(YYINITIAL); return YappingTypes.LIST_START; }
-    {LIST_END}                                      { yybegin(YYINITIAL); return YappingTypes.LIST_END; }*/
-    //{JPATH_START}                                   { setContext(JPATH); yybegin(JPATH); return YappingTypes.JPATH_START; }
+    // parts in yapping paths
+    {YNAME}                                         { return YappingTypes.YNAME; }
+    {YBODY}                                         { return YappingTypes.YBODY; }
+    {NATURAL}                                       { return YappingTypes.NATURAL; }
+    {DOT}                                           { return YappingTypes.DOT; }
 }
-<BEFORE_SLASH, BEFORE_JSCOPE, BEFORE_YSCOPE> {
-    // parsing these will fallback to BEFORE_(SLASH|JSCOPE)
+// DEFAULT 4: items in a path that can be followed by . or /
+<YYINITIAL, BEFORE_SLASH, BEFORE_JSCOPE, AFTER_JSCOPE, AFTER_SLASH> {
+    // if have another token that can be used in the path, then use it
+    // after REGEX or LITERAL are parsed. Will fall back to BEFORE_(SCOPE|SLASH)
     {REGEX_QUOTE}                                   {yybegin(REGEX);}
     {LITERAL_QUOTE}                                 {yybegin(LITERAL);}
+    {MAP_START}                                     {
+                                                        openYappingSegment();
+                                                        return YappingTypes.MAP_START;
+                                                    }
+    {MAP_END}                                       {
+                                                        closeCurrentSegment();
+                                                        return YappingTypes.MAP_END;
+                                                    }
+    {LIST_START}                                    {
+                                                        openYappingSegment();
+                                                        return YappingTypes.LIST_START;
+                                                    }
+    {LIST_END}                                      {
+                                                        closeCurrentSegment();
+                                                        return YappingTypes.LIST_END;
+                                                    }
+    {PRECEDENCE_START}                              {
+                                                        openYappingSegment();
+                                                        return YappingTypes.PRECEDENCE_START;
+                                                    }
+    {PRECEDENCE_END}                                {
+                                                        closeCurrentSegment();
+                                                        return YappingTypes.PRECEDENCE_END;
+                                                    }
 }
+// DEFAULT 5: items that may be in a file path but not in a java path/yapping path
+<YYINITIAL, BEFORE_JSCOPE, PENDING_JSCOPE, PENDING_SLASH> {
+    {AND}                                           {
+                                                        startNewYappingPath();
+                                                        return YappingTypes.AND;
+                                                    }
+    {PLUS}                                          {
+                                                        startNewYappingPath();
+                                                        return YappingTypes.PLUS;
+                                                    }
+    {MINUS}                                         {
+                                                        startNewYappingPath();
+                                                        return YappingTypes.MINUS;
+                                                    }
+
+}
+
 <BEFORE_SLASH> {
     // encounter a file name, state doesn't change.
     {FNAME}                                         {return YappingTypes.FNAME;}
@@ -194,36 +357,19 @@ TRANSITION_SEP_R="->"
     {WHITESPACE}                                    {yybegin(PENDING_SLASH); return TokenType.WHITE_SPACE;}
     // other valid tokens are covered in DEFAULT 2
 }
-<BEFORE_YSCOPE> {
-    // note - ambiguity with the following: "a."123 vs "a."123asdf
-    //  however 123asdf will match to YBODY since it's the larger token, and
-    //  123 will match to NATURAL as it's the first listed in the program.
-    {NATURAL}                                       {return YappingTypes.NATURAL;}
-    {YBODY}                                         {return YappingTypes.YBODY;}
-    {DOT}                                           {yybegin(AFTER_YSCOPE); return YappingTypes.DOT; }
-     // pending scope - if we encounter another . we are still parsing path. otherwise we are parsing a new item.
-    {COMMENT}                                       {yybegin(PENDING_YSCOPE); return YappingTypes.COMMENT;}
-    {WHITESPACE}                                    {yybegin(PENDING_YSCOPE); return TokenType.WHITE_SPACE;}
-}
 <BEFORE_JSCOPE> {
     [:jletterdigit:]+                               {return YappingTypes.JBODY;}
     // encountered a scope - we may now have whitespace
-    {DOT}                                         {yybegin(AFTER_JSCOPE); return YappingTypes.DOT; }
+    {DOT}                                           {yybegin(AFTER_JSCOPE); return YappingTypes.DOT; }
     // pending slash - if we encounter another / we are still parsing file path. otherwise we are parsing a new item.
     {COMMENT}                                       {yybegin(PENDING_JSCOPE); return YappingTypes.COMMENT;}
     {WHITESPACE}                                    {yybegin(PENDING_JSCOPE); return TokenType.WHITE_SPACE;}
     // other valid tokens are covered in DEFAULT 2
 }
-<AFTER_SLASH, AFTER_JSCOPE, PENDING_JSCOPE, PENDING_SLASH, AFTER_YSCOPE, PENDING_YSCOPE> {
+<AFTER_SLASH, AFTER_JSCOPE, PENDING_JSCOPE, PENDING_SLASH> {
     // after or pending a scope separator: comments and or whitespace will stay in the same state
     {WHITESPACE}                                    {return TokenType.WHITE_SPACE;}
     {COMMENT}                                       {return YappingTypes.COMMENT;}
-}
-<AFTER_JSCOPE, AFTER_SLASH, AFTER_YSCOPE> {
-    // if have another token that can be used in the path, then use it
-    // after REGEX or LITERAL are parsed. Will fall back to BEFORE_(SCOPE|SLASH)
-    {REGEX_QUOTE}                                   {yybegin(REGEX);}
-    {LITERAL_QUOTE}                                 {yybegin(LITERAL);}
 }
 <AFTER_SLASH> {
     // file//asdf is fine
@@ -234,10 +380,6 @@ TRANSITION_SEP_R="->"
     //             123  # resolves to my/folder/123
     //             @my/folder/  # resolves to my/folder
 }
-<AFTER_YSCOPE> {
-    {YNAME}                                         {yybegin(BEFORE_YSCOPE); return YappingTypes.YNAME;}
-    {NATURAL}                                       {yybegin(BEFORE_YSCOPE); return YappingTypes.NATURAL;}
-}
 <AFTER_JSCOPE> {
     // identifier.. is not valid
     //{SCOPE}                                         {return TokenType.BAD_CHARACTER;}
@@ -247,21 +389,18 @@ TRANSITION_SEP_R="->"
 }
 <PENDING_SLASH> {
     // before a path separator, comments and whitespaces separate to next item
-    {SLASH}                                     {yybegin(AFTER_SLASH); return YappingTypes.SLASH; }
+    {SLASH}                                         {yybegin(AFTER_SLASH); return YappingTypes.SLASH; }
     // other valid tokens are covered in DEFAULT 1
 }
-<PENDING_YSCOPE> {
-    {DOT}                                         {yybegin(AFTER_YSCOPE); return YappingTypes.DOT; }
-}
 <PENDING_JSCOPE> {
-    {DOT}                                         {yybegin(AFTER_JSCOPE); return YappingTypes.DOT; }
+    {DOT}                                           {yybegin(AFTER_JSCOPE); return YappingTypes.DOT; }
 }
 <LITERAL> {
     // escaped quote in string
     \\\"                                            {}
     // end of quote
     {LITERAL_QUOTE}                                 {
-                                                        yybegin(getContext());
+                                                        yybegin(getCurrentFallback());
                                                         return YappingTypes.LITERAL;
                                                     }
     // body: everything except " and \
@@ -276,7 +415,7 @@ TRANSITION_SEP_R="->"
     \\\[                                            { yybegin(REGEX); }
     \[                                              { yybegin(REGEX_CLASS); }
     // end of regex, transition back to INITIAL
-    {REGEX_QUOTE}                                   { yybegin(getContext()); return YappingTypes.REGEX; }
+    {REGEX_QUOTE}                                   { yybegin(getCurrentFallback()); return YappingTypes.REGEX; }
     // body: everything except `, \, and [
     [^\\\`\[]+                                      {}
     // body: everything \. except \` and \[
