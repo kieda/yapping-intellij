@@ -22,19 +22,23 @@
  *   properties2:
  *  // goes to the end of file
  */
-yapping ::= item* Properties? // properties ends the file
+//yapping ::= item* Properties? {rightAssociative=true}
+yapping ::= (Properties|(item yapping))?
+yapping_ ::= Properties|(item yapping_?)
+//items ::= (SectionData (COMMENT|WHITESPACE)+)*
 item ::=
     SectionData
     |COMMENT|WHITESPACE // whitespace
 
 SectionData ::= Pair|TransitionL|TransitionR|BaseData
 
-BaseData ::= Precedence // (x)
-    |Map|List   // composite data
-    |jPath|fPath|yPath1 // paths. final path is a two part or more yapping segment
+BaseData ::=
+    yPath1|jPath|fPath // paths. final path is a two part or more yapping segment
     |ySegmentMulti  // single yapping segment (not a path)
+    |Precedence // (x)
+    |Map|List   // composite data
+    |REAL|QUOTIENT|INTEGER  // primitive - numbers
     |REGEX|LITERAL|YNAME // primitive - string types
-    |QUOTIENT|INTEGER|REAL  // primitive - numbers
 // # Java Paths and Scopes
 // `[a-z]`0`[a-z]`1       x0y1
 // "asdf"0"asdf"`[a-z]`   asdf0asdfx
@@ -44,27 +48,28 @@ BaseData ::= Precedence // (x)
 // 0"asdf"                <invalid>
 // 0`[1-9]`               <invalid>
     jPath ::= (JPATH_START spacing jScope)
-    private jScope ::= jScopeSegment (spacing DOT spacing jScope)?
-    private jScopeSegment ::= (jSegmentSingle|jSegmentMulti)
+    jScope ::= jScopeSegment (spacing DOT spacing jScope)?
+    jScopeSegment ::= (jSegmentMulti|jSegmentSingle)
     // single item in the segment
-    private jSegmentSingle ::= JNAME | containedSegment
+    jSegmentSingle ::= JNAME | containedSegment
     // multiple items in the segment
-    private jSegmentMulti ::= (JNAME jSegmentExclJBody)
+    jSegmentMulti ::=
+        (JNAME jSegmentExclJBody)
         | (containedSegment jSegmentInclJBody)
     // jBody or jName cannot show up twice in a row
-    private jSegmentExclJBody ::= containedSegment jSegmentInclJBody?
-    private jSegmentInclJBody ::= (JBODY jSegmentExclJBody?)
-        | jSegmentExclJBody
+    jSegmentInclJBody ::= (JBODY jSegmentExclJBody?)
+            | jSegmentExclJBody
+    jSegmentExclJBody ::= containedSegment jSegmentInclJBody?
 
 // # file paths and scopes
     fPath ::= (FPATH_START spacing fScope)
-    private fScope ::= fScopeSegment (spacing SLASH spacing fScope)?
-    private fScopeSegment ::= fSegmentSingle | fSegmentMulti
-    private fSegmentSingle ::= FNAME | containedSegment
-    private fSegmentMulti ::= (containedSegment fSegmentInclFName)
+    fScope ::= fScopeSegment (spacing SLASH spacing fScope)?
+    fScopeSegment ::= fSegmentMulti | fSegmentSingle
+    fSegmentSingle ::= FNAME | containedSegment
+    fSegmentMulti ::= (containedSegment fSegmentInclFName)
         | (FNAME fSegmentExclFName)
-    private fSegmentExclFName ::= containedSegment fSegmentInclFName?
-    private fSegmentInclFName ::= (FNAME fSegmentExclFName?)
+    fSegmentExclFName ::= containedSegment fSegmentInclFName?
+    fSegmentInclFName ::= (FNAME (fSegmentExclFName?))
         | fSegmentExclFName
 
 // # yapping paths and scopes
@@ -73,10 +78,10 @@ BaseData ::= Precedence // (x)
         | (ySegmentExclNat spacing DOT spacing yPathRest)
 
     // fun idea -- ipaddress: 127.0.0.1 693.5.9.3; -- note that 0.0 would represent a double otherwise
-    private ySegmentExclNat ::= ySegmentMulti | YNAME | containedSegment // multi segments are not considered nats
+    ySegmentExclNat ::= ySegmentMulti | YNAME | containedSegment // multi segments are not considered nats
 
-    private yPathRest ::= (YNAME|NATURAL|containedSegment|ySegmentMulti) (spacing DOT spacing yPathRest)?
-    private ySegmentMulti ::= (containedSegment ySegmentInclVals)
+    yPathRest ::= (YNAME|NATURAL|containedSegment|ySegmentMulti) (spacing DOT spacing yPathRest)?
+    ySegmentMulti ::= (containedSegment ySegmentInclVals)
         | ((YNAME|NATURAL) ySegmentExclVals)
 
     // (55).`~*5` vs 55.`~*5`
@@ -84,18 +89,12 @@ BaseData ::= Precedence // (x)
     // NATURAL -> containedSegment
     // (yBody|yName) -> containedSegment
     // containedSegment -> YBODY|NATURAL|containedSegment
-    private ySegmentExclVals ::= containedSegment ySegmentInclVals?
-    private ySegmentInclVals ::= ((NATURAL|YBODY) ySegmentExclVals?)
+    ySegmentExclVals ::= containedSegment ySegmentInclVals?
+    ySegmentInclVals ::= ((NATURAL|YBODY) ySegmentExclVals?)
         | ySegmentExclVals
 
     // disallow NATURAL.NATURAL
     // -1.0.123
-
-// all these items that can be contained in a path and have incipient and terminator chars.
-private containedSegment ::= REGEX|LITERAL|List|Map|Precedence
-// asdf10&3/4 vs "asdf"10 & 3/4"asdf"
-// spacing items
-private spacing ::= (WHITESPACE|COMMENT)*
 
 // possible -
 /// connect any number of paths using "asdf"+(123, 456).0+"abc"
@@ -109,11 +108,11 @@ private spacing ::= (WHITESPACE|COMMENT)*
  * DFA for processing integers
  */
 
-QUOTIENT ::= (INTEGER spacing) AND INTEGER spacing SLASH spacing NATURAL // 1 & 3/4, -1 &3/4, +1 & -3/4.
+QUOTIENT ::= (INTEGER spacing AND spacing)? INTEGER spacing SLASH spacing NATURAL // 1 & 3/4, -1 &3/4, +1 & -3/4.
 INTEGER ::= (SIGN spacing)? NATURAL
 REAL ::= (SIGN spacing)? DECIMAL
 DECIMAL ::= NATURAL DOT NATURAL // define DECIMAL in parser rather than lexer, as this might be part of a ysegment rather than a decimal
-private SIGN ::= (PLUS|MINUS)
+SIGN ::= (PLUS|MINUS)
 
 // properties is just
 //     name1 : value1a value1b
@@ -121,7 +120,8 @@ private SIGN ::= (PLUS|MINUS)
 // to nest properties, we use precedence
 //     name1 : value1a value1b
 //     (name2 : value2a value2b) value2c
-Properties ::= (BaseData spacing PROPERTY_SEP item*)+
+Properties ::= BaseData spacing PROPERTY_SEP (yapping_)?
+//Section ::= BaseData spacing PROPERTY_SEP item* {pin=3}
 
 Map ::= (MAP_START spacing MAP_END) // {}
     // { a = b[, c = d]* }
@@ -131,6 +131,17 @@ List ::= (LIST_START LIST_END) // []
     | LIST_START spacing BoundedData (spacing LIST_SEP spacing BoundedData)* spacing LIST_END
 Precedence ::= PRECEDENCE_START spacing BoundedData spacing PRECEDENCE_END
 
+Pair ::= PairExpr|TransitionLExpr|TransitionRExpr|BaseData
+PairExpr ::= (TransitionLExpr|TransitionRExpr|BaseData) spacing PAIR_SEP spacing Pair {rightAssociative=true}
+TransitionLExpr ::= (TransitionRExpr|BaseData) spacing TRANSITION_SEP_L Pair {rightAssociative=true}
+TransitionRExpr ::= BaseData spacing TRANSITION_SEP_R Pair {rightAssociative=true}
+
+
+BoundedData ::= PairBounded|TransitionLBounded|TransitionRBounded|Properties|BaseData
+PairBounded ::= (TransitionLExpr|TransitionRExpr|BaseData) spacing PAIR_SEP spacing BoundedData {rightAssociative=true}
+TransitionLBounded ::= (TransitionRExpr|BaseData) spacing TRANSITION_SEP_L spacing BoundedData {rightAssociative=true}
+TransitionRBounded ::= BaseData spacing TRANSITION_SEP_R spacing BoundedData {rightAssociative=true}
+/*
 Pair ::= (BaseData|TransitionL|TransitionR) spacing PAIR_SEP spacing (BaseData|Pair|TransitionL|TransitionR){rightAssociative=true} // default pair. sectiona: x = y sectionb: asdf
 PairBounded ::= (BaseData|TransitionL|TransitionR) spacing PAIR_SEP spacing BoundedData{rightAssociative=true} // pair that may end in properties. (x = y = section: lol)
 // A -> B <- A -> B =
@@ -138,5 +149,13 @@ TransitionL ::= (BaseData|TransitionR) spacing TRANSITION_SEP_L spacing (BaseDat
 TransitionLBounded ::= (BaseData|TransitionR) spacing TRANSITION_SEP_L spacing (Properties|TransitionLBounded|TransitionRBounded|BaseData){rightAssociative=true}
 TransitionR ::= BaseData spacing TRANSITION_SEP_R spacing (BaseData|TransitionR){rightAssociative=true}
 TransitionRBounded ::= BaseData spacing TRANSITION_SEP_R spacing (Properties|TransitionRBounded|BaseData){rightAssociative=true}
+*/
 
-BoundedData ::= Properties|PairBounded|TransitionLBounded|TransitionRBounded|BaseData // data that is surrounded by bounds
+
+//BoundedData ::= Properties|PairBounded|TransitionLBounded|TransitionRBounded|BaseData // data that is surrounded by bounds
+
+// all these items that can be contained in a path and have incipient and terminator chars.
+containedSegment ::= REGEX|LITERAL|List|Map|Precedence
+// asdf10&3/4 vs "asdf"10 & 3/4"asdf"
+// spacing items
+spacing ::= (WHITESPACE|COMMENT)*

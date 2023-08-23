@@ -52,9 +52,9 @@ public class YappingBaseDataImpl extends ASTWrapperPsiElement implements Yapping
   }
 
   @Override
-  @NotNull
-  public List<YappingQuotient> getQuotientList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, YappingQuotient.class);
+  @Nullable
+  public YappingQuotient getQuotient() {
+    return findChildByClass(YappingQuotient.class);
   }
 
   @Override
@@ -79,6 +79,12 @@ public class YappingBaseDataImpl extends ASTWrapperPsiElement implements Yapping
   @Nullable
   public YappingYPath1 getYPath1() {
     return findChildByClass(YappingYPath1.class);
+  }
+
+  @Override
+  @Nullable
+  public YappingYSegmentMulti getYSegmentMulti() {
+    return findChildByClass(YappingYSegmentMulti.class);
   }
 
 }

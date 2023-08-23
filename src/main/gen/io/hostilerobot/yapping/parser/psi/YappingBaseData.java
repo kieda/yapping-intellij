@@ -19,8 +19,8 @@ public interface YappingBaseData extends PsiElement {
   @Nullable
   YappingPrecedence getPrecedence();
 
-  @NotNull
-  List<YappingQuotient> getQuotientList();
+  @Nullable
+  YappingQuotient getQuotient();
 
   @Nullable
   YappingReal getReal();
@@ -33,5 +33,8 @@ public interface YappingBaseData extends PsiElement {
 
   @Nullable
   YappingYPath1 getYPath1();
+
+  @Nullable
+  YappingYSegmentMulti getYSegmentMulti();
 
 }

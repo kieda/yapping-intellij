@@ -36,43 +36,43 @@ public class YappingParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // Precedence // (x)
-  //     |Map|List   // composite data
-  //     |jPath|fPath|yPath1 // paths. final path is a two part or more yapping segment
+  // yPath1|jPath|fPath // paths. final path is a two part or more yapping segment
   //     |ySegmentMulti  // single yapping segment (not a path)
-  //     |REGEX|LITERAL|YNAME // primitive - string types
-  //     |QUOTIENT|INTEGER|REAL
+  //     |Precedence // (x)
+  //     |Map|List   // composite data
+  //     |REAL|QUOTIENT|INTEGER  // primitive - numbers
+  //     |REGEX|LITERAL|YNAME
   public static boolean BaseData(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "BaseData")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, BASE_DATA, "<base data>");
-    r = Precedence(b, l + 1);
-    if (!r) r = Map(b, l + 1);
-    if (!r) r = List(b, l + 1);
+    r = yPath1(b, l + 1);
     if (!r) r = jPath(b, l + 1);
     if (!r) r = fPath(b, l + 1);
-    if (!r) r = yPath1(b, l + 1);
     if (!r) r = ySegmentMulti(b, l + 1);
+    if (!r) r = Precedence(b, l + 1);
+    if (!r) r = Map(b, l + 1);
+    if (!r) r = List(b, l + 1);
+    if (!r) r = REAL(b, l + 1);
+    if (!r) r = QUOTIENT(b, l + 1);
+    if (!r) r = INTEGER(b, l + 1);
     if (!r) r = consumeToken(b, REGEX);
     if (!r) r = consumeToken(b, LITERAL);
     if (!r) r = consumeToken(b, YNAME);
-    if (!r) r = QUOTIENT(b, l + 1);
-    if (!r) r = INTEGER(b, l + 1);
-    if (!r) r = REAL(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
 
   /* ********************************************************** */
-  // Properties|PairBounded|TransitionLBounded|TransitionRBounded|BaseData
+  // PairBounded|TransitionLBounded|TransitionRBounded|Properties|BaseData
   public static boolean BoundedData(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "BoundedData")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, BOUNDED_DATA, "<bounded data>");
-    r = Properties(b, l + 1);
-    if (!r) r = PairBounded(b, l + 1);
+    r = PairBounded(b, l + 1);
     if (!r) r = TransitionLBounded(b, l + 1);
     if (!r) r = TransitionRBounded(b, l + 1);
+    if (!r) r = Properties(b, l + 1);
     if (!r) r = BaseData(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
@@ -251,43 +251,21 @@ public class YappingParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // (BaseData|TransitionL|TransitionR) spacing PAIR_SEP spacing (BaseData|Pair|TransitionL|TransitionR)
+  // PairExpr|TransitionLExpr|TransitionRExpr|BaseData
   public static boolean Pair(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "Pair")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, PAIR, "<pair>");
-    r = Pair_0(b, l + 1);
-    r = r && spacing(b, l + 1);
-    r = r && consumeToken(b, PAIR_SEP);
-    r = r && spacing(b, l + 1);
-    r = r && Pair_4(b, l + 1);
+    r = PairExpr(b, l + 1);
+    if (!r) r = TransitionLExpr(b, l + 1);
+    if (!r) r = TransitionRExpr(b, l + 1);
+    if (!r) r = BaseData(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
 
-  // BaseData|TransitionL|TransitionR
-  private static boolean Pair_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "Pair_0")) return false;
-    boolean r;
-    r = BaseData(b, l + 1);
-    if (!r) r = TransitionL(b, l + 1);
-    if (!r) r = TransitionR(b, l + 1);
-    return r;
-  }
-
-  // BaseData|Pair|TransitionL|TransitionR
-  private static boolean Pair_4(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "Pair_4")) return false;
-    boolean r;
-    r = BaseData(b, l + 1);
-    if (!r) r = Pair(b, l + 1);
-    if (!r) r = TransitionL(b, l + 1);
-    if (!r) r = TransitionR(b, l + 1);
-    return r;
-  }
-
   /* ********************************************************** */
-  // (BaseData|TransitionL|TransitionR) spacing PAIR_SEP spacing BoundedData
+  // (TransitionLExpr|TransitionRExpr|BaseData) spacing PAIR_SEP spacing BoundedData
   public static boolean PairBounded(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "PairBounded")) return false;
     boolean r;
@@ -301,13 +279,38 @@ public class YappingParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // BaseData|TransitionL|TransitionR
+  // TransitionLExpr|TransitionRExpr|BaseData
   private static boolean PairBounded_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "PairBounded_0")) return false;
     boolean r;
-    r = BaseData(b, l + 1);
-    if (!r) r = TransitionL(b, l + 1);
-    if (!r) r = TransitionR(b, l + 1);
+    r = TransitionLExpr(b, l + 1);
+    if (!r) r = TransitionRExpr(b, l + 1);
+    if (!r) r = BaseData(b, l + 1);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // (TransitionLExpr|TransitionRExpr|BaseData) spacing PAIR_SEP spacing Pair
+  public static boolean PairExpr(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "PairExpr")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, PAIR_EXPR, "<pair expr>");
+    r = PairExpr_0(b, l + 1);
+    r = r && spacing(b, l + 1);
+    r = r && consumeToken(b, PAIR_SEP);
+    r = r && spacing(b, l + 1);
+    r = r && Pair(b, l + 1);
+    exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  // TransitionLExpr|TransitionRExpr|BaseData
+  private static boolean PairExpr_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "PairExpr_0")) return false;
+    boolean r;
+    r = TransitionLExpr(b, l + 1);
+    if (!r) r = TransitionRExpr(b, l + 1);
+    if (!r) r = BaseData(b, l + 1);
     return r;
   }
 
@@ -328,53 +331,43 @@ public class YappingParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // (BaseData spacing PROPERTY_SEP item*)+
+  // BaseData spacing PROPERTY_SEP (yapping_)?
   public static boolean Properties(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "Properties")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, PROPERTIES, "<properties>");
-    r = Properties_0(b, l + 1);
-    while (r) {
-      int c = current_position_(b);
-      if (!Properties_0(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "Properties", c)) break;
-    }
+    r = BaseData(b, l + 1);
+    r = r && spacing(b, l + 1);
+    r = r && consumeToken(b, PROPERTY_SEP);
+    r = r && Properties_3(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
 
-  // BaseData spacing PROPERTY_SEP item*
-  private static boolean Properties_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "Properties_0")) return false;
+  // (yapping_)?
+  private static boolean Properties_3(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "Properties_3")) return false;
+    Properties_3_0(b, l + 1);
+    return true;
+  }
+
+  // (yapping_)
+  private static boolean Properties_3_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "Properties_3_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = BaseData(b, l + 1);
-    r = r && spacing(b, l + 1);
-    r = r && consumeToken(b, PROPERTY_SEP);
-    r = r && Properties_0_3(b, l + 1);
+    r = yapping_(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
-  // item*
-  private static boolean Properties_0_3(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "Properties_0_3")) return false;
-    while (true) {
-      int c = current_position_(b);
-      if (!item(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "Properties_0_3", c)) break;
-    }
-    return true;
-  }
-
   /* ********************************************************** */
-  // (INTEGER spacing) AND INTEGER spacing SLASH spacing NATURAL
+  // (INTEGER spacing AND spacing)? INTEGER spacing SLASH spacing NATURAL
   public static boolean QUOTIENT(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "QUOTIENT")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, QUOTIENT, "<quotient>");
     r = QUOTIENT_0(b, l + 1);
-    r = r && consumeToken(b, AND);
     r = r && INTEGER(b, l + 1);
     r = r && spacing(b, l + 1);
     r = r && consumeToken(b, SLASH);
@@ -384,12 +377,21 @@ public class YappingParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // INTEGER spacing
+  // (INTEGER spacing AND spacing)?
   private static boolean QUOTIENT_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "QUOTIENT_0")) return false;
+    QUOTIENT_0_0(b, l + 1);
+    return true;
+  }
+
+  // INTEGER spacing AND spacing
+  private static boolean QUOTIENT_0_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "QUOTIENT_0_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = INTEGER(b, l + 1);
+    r = r && spacing(b, l + 1);
+    r = r && consumeToken(b, AND);
     r = r && spacing(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
@@ -427,64 +429,33 @@ public class YappingParser implements PsiParser, LightPsiParser {
 
   /* ********************************************************** */
   // PLUS|MINUS
-  static boolean SIGN(PsiBuilder b, int l) {
+  public static boolean SIGN(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "SIGN")) return false;
-    if (!nextTokenIs(b, "", MINUS, PLUS)) return false;
+    if (!nextTokenIs(b, "<sign>", MINUS, PLUS)) return false;
     boolean r;
+    Marker m = enter_section_(b, l, _NONE_, SIGN, "<sign>");
     r = consumeToken(b, PLUS);
     if (!r) r = consumeToken(b, MINUS);
+    exit_section_(b, l, m, r, false, null);
     return r;
   }
 
   /* ********************************************************** */
-  // Pair|TransitionR|BaseData
+  // Pair|TransitionL|TransitionR|BaseData
   public static boolean SectionData(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "SectionData")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, SECTION_DATA, "<section data>");
     r = Pair(b, l + 1);
-    if (!r) r = TransitionR(b, l + 1);
+    if (!r) r = consumeToken(b, TRANSITIONL);
+    if (!r) r = consumeToken(b, TRANSITIONR);
     if (!r) r = BaseData(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
 
   /* ********************************************************** */
-  // (BaseData|TransitionR) spacing TRANSITION_SEP_L spacing (BaseData|TransitionL|TransitionR)
-  public static boolean TransitionL(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "TransitionL")) return false;
-    boolean r;
-    Marker m = enter_section_(b, l, _NONE_, TRANSITION_L, "<transition l>");
-    r = TransitionL_0(b, l + 1);
-    r = r && spacing(b, l + 1);
-    r = r && consumeToken(b, TRANSITION_SEP_L);
-    r = r && spacing(b, l + 1);
-    r = r && TransitionL_4(b, l + 1);
-    exit_section_(b, l, m, r, false, null);
-    return r;
-  }
-
-  // BaseData|TransitionR
-  private static boolean TransitionL_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "TransitionL_0")) return false;
-    boolean r;
-    r = BaseData(b, l + 1);
-    if (!r) r = TransitionR(b, l + 1);
-    return r;
-  }
-
-  // BaseData|TransitionL|TransitionR
-  private static boolean TransitionL_4(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "TransitionL_4")) return false;
-    boolean r;
-    r = BaseData(b, l + 1);
-    if (!r) r = TransitionL(b, l + 1);
-    if (!r) r = TransitionR(b, l + 1);
-    return r;
-  }
-
-  /* ********************************************************** */
-  // (BaseData|TransitionR) spacing TRANSITION_SEP_L spacing (Properties|TransitionLBounded|TransitionRBounded|BaseData)
+  // (TransitionRExpr|BaseData) spacing TRANSITION_SEP_L spacing BoundedData
   public static boolean TransitionLBounded(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "TransitionLBounded")) return false;
     boolean r;
@@ -493,57 +464,45 @@ public class YappingParser implements PsiParser, LightPsiParser {
     r = r && spacing(b, l + 1);
     r = r && consumeToken(b, TRANSITION_SEP_L);
     r = r && spacing(b, l + 1);
-    r = r && TransitionLBounded_4(b, l + 1);
+    r = r && BoundedData(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
 
-  // BaseData|TransitionR
+  // TransitionRExpr|BaseData
   private static boolean TransitionLBounded_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "TransitionLBounded_0")) return false;
     boolean r;
-    r = BaseData(b, l + 1);
-    if (!r) r = TransitionR(b, l + 1);
-    return r;
-  }
-
-  // Properties|TransitionLBounded|TransitionRBounded|BaseData
-  private static boolean TransitionLBounded_4(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "TransitionLBounded_4")) return false;
-    boolean r;
-    r = Properties(b, l + 1);
-    if (!r) r = TransitionLBounded(b, l + 1);
-    if (!r) r = TransitionRBounded(b, l + 1);
+    r = TransitionRExpr(b, l + 1);
     if (!r) r = BaseData(b, l + 1);
     return r;
   }
 
   /* ********************************************************** */
-  // BaseData spacing TRANSITION_SEP_R spacing (BaseData|TransitionR)
-  public static boolean TransitionR(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "TransitionR")) return false;
+  // (TransitionRExpr|BaseData) spacing TRANSITION_SEP_L Pair
+  public static boolean TransitionLExpr(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "TransitionLExpr")) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _NONE_, TRANSITION_R, "<transition r>");
-    r = BaseData(b, l + 1);
+    Marker m = enter_section_(b, l, _NONE_, TRANSITION_L_EXPR, "<transition l expr>");
+    r = TransitionLExpr_0(b, l + 1);
     r = r && spacing(b, l + 1);
-    r = r && consumeToken(b, TRANSITION_SEP_R);
-    r = r && spacing(b, l + 1);
-    r = r && TransitionR_4(b, l + 1);
+    r = r && consumeToken(b, TRANSITION_SEP_L);
+    r = r && Pair(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
 
-  // BaseData|TransitionR
-  private static boolean TransitionR_4(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "TransitionR_4")) return false;
+  // TransitionRExpr|BaseData
+  private static boolean TransitionLExpr_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "TransitionLExpr_0")) return false;
     boolean r;
-    r = BaseData(b, l + 1);
-    if (!r) r = TransitionR(b, l + 1);
+    r = TransitionRExpr(b, l + 1);
+    if (!r) r = BaseData(b, l + 1);
     return r;
   }
 
   /* ********************************************************** */
-  // BaseData spacing TRANSITION_SEP_R spacing (Properties|TransitionRBounded|BaseData)
+  // BaseData spacing TRANSITION_SEP_R spacing BoundedData
   public static boolean TransitionRBounded(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "TransitionRBounded")) return false;
     boolean r;
@@ -552,41 +511,37 @@ public class YappingParser implements PsiParser, LightPsiParser {
     r = r && spacing(b, l + 1);
     r = r && consumeToken(b, TRANSITION_SEP_R);
     r = r && spacing(b, l + 1);
-    r = r && TransitionRBounded_4(b, l + 1);
+    r = r && BoundedData(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
 
-  // Properties|TransitionRBounded|BaseData
-  private static boolean TransitionRBounded_4(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "TransitionRBounded_4")) return false;
+  /* ********************************************************** */
+  // BaseData spacing TRANSITION_SEP_R Pair
+  public static boolean TransitionRExpr(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "TransitionRExpr")) return false;
     boolean r;
-    r = Properties(b, l + 1);
-    if (!r) r = TransitionRBounded(b, l + 1);
-    if (!r) r = BaseData(b, l + 1);
+    Marker m = enter_section_(b, l, _NONE_, TRANSITION_R_EXPR, "<transition r expr>");
+    r = BaseData(b, l + 1);
+    r = r && spacing(b, l + 1);
+    r = r && consumeToken(b, TRANSITION_SEP_R);
+    r = r && Pair(b, l + 1);
+    exit_section_(b, l, m, r, false, null);
     return r;
   }
 
   /* ********************************************************** */
   // REGEX|LITERAL|List|Map|Precedence
-  static boolean containedSegment(PsiBuilder b, int l) {
+  public static boolean containedSegment(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "containedSegment")) return false;
     boolean r;
+    Marker m = enter_section_(b, l, _NONE_, CONTAINED_SEGMENT, "<contained segment>");
     r = consumeToken(b, REGEX);
     if (!r) r = consumeToken(b, LITERAL);
     if (!r) r = List(b, l + 1);
     if (!r) r = Map(b, l + 1);
     if (!r) r = Precedence(b, l + 1);
-    return r;
-  }
-
-  /* ********************************************************** */
-  // containedSegment|QUOTIENT
-  static boolean containedSegmentQ(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "containedSegmentQ")) return false;
-    boolean r;
-    r = containedSegment(b, l + 1);
-    if (!r) r = QUOTIENT(b, l + 1);
+    exit_section_(b, l, m, r, false, null);
     return r;
   }
 
@@ -606,13 +561,13 @@ public class YappingParser implements PsiParser, LightPsiParser {
 
   /* ********************************************************** */
   // fScopeSegment (spacing SLASH spacing fScope)?
-  static boolean fScope(PsiBuilder b, int l) {
+  public static boolean fScope(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "fScope")) return false;
     boolean r;
-    Marker m = enter_section_(b);
+    Marker m = enter_section_(b, l, _NONE_, F_SCOPE, "<f scope>");
     r = fScopeSegment(b, l + 1);
     r = r && fScope_1(b, l + 1);
-    exit_section_(b, m, null, r);
+    exit_section_(b, l, m, r, false, null);
     return r;
   }
 
@@ -637,24 +592,26 @@ public class YappingParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // fSegmentSingle | fSegmentMulti
-  static boolean fScopeSegment(PsiBuilder b, int l) {
+  // fSegmentMulti | fSegmentSingle
+  public static boolean fScopeSegment(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "fScopeSegment")) return false;
     boolean r;
-    r = fSegmentSingle(b, l + 1);
-    if (!r) r = fSegmentMulti(b, l + 1);
+    Marker m = enter_section_(b, l, _NONE_, F_SCOPE_SEGMENT, "<f scope segment>");
+    r = fSegmentMulti(b, l + 1);
+    if (!r) r = fSegmentSingle(b, l + 1);
+    exit_section_(b, l, m, r, false, null);
     return r;
   }
 
   /* ********************************************************** */
   // containedSegment fSegmentInclFName?
-  static boolean fSegmentExclFName(PsiBuilder b, int l) {
+  public static boolean fSegmentExclFName(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "fSegmentExclFName")) return false;
     boolean r;
-    Marker m = enter_section_(b);
+    Marker m = enter_section_(b, l, _NONE_, F_SEGMENT_EXCL_F_NAME, "<f segment excl f name>");
     r = containedSegment(b, l + 1);
     r = r && fSegmentExclFName_1(b, l + 1);
-    exit_section_(b, m, null, r);
+    exit_section_(b, l, m, r, false, null);
     return r;
   }
 
@@ -666,19 +623,19 @@ public class YappingParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // (FNAME fSegmentExclFName?)
+  // (FNAME (fSegmentExclFName?))
   //         | fSegmentExclFName
-  static boolean fSegmentInclFName(PsiBuilder b, int l) {
+  public static boolean fSegmentInclFName(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "fSegmentInclFName")) return false;
     boolean r;
-    Marker m = enter_section_(b);
+    Marker m = enter_section_(b, l, _NONE_, F_SEGMENT_INCL_F_NAME, "<f segment incl f name>");
     r = fSegmentInclFName_0(b, l + 1);
     if (!r) r = fSegmentExclFName(b, l + 1);
-    exit_section_(b, m, null, r);
+    exit_section_(b, l, m, r, false, null);
     return r;
   }
 
-  // FNAME fSegmentExclFName?
+  // FNAME (fSegmentExclFName?)
   private static boolean fSegmentInclFName_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "fSegmentInclFName_0")) return false;
     boolean r;
@@ -699,13 +656,13 @@ public class YappingParser implements PsiParser, LightPsiParser {
   /* ********************************************************** */
   // (containedSegment fSegmentInclFName)
   //         | (FNAME fSegmentExclFName)
-  static boolean fSegmentMulti(PsiBuilder b, int l) {
+  public static boolean fSegmentMulti(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "fSegmentMulti")) return false;
     boolean r;
-    Marker m = enter_section_(b);
+    Marker m = enter_section_(b, l, _NONE_, F_SEGMENT_MULTI, "<f segment multi>");
     r = fSegmentMulti_0(b, l + 1);
     if (!r) r = fSegmentMulti_1(b, l + 1);
-    exit_section_(b, m, null, r);
+    exit_section_(b, l, m, r, false, null);
     return r;
   }
 
@@ -733,11 +690,13 @@ public class YappingParser implements PsiParser, LightPsiParser {
 
   /* ********************************************************** */
   // FNAME | containedSegment
-  static boolean fSegmentSingle(PsiBuilder b, int l) {
+  public static boolean fSegmentSingle(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "fSegmentSingle")) return false;
     boolean r;
+    Marker m = enter_section_(b, l, _NONE_, F_SEGMENT_SINGLE, "<f segment single>");
     r = consumeToken(b, FNAME);
     if (!r) r = containedSegment(b, l + 1);
+    exit_section_(b, l, m, r, false, null);
     return r;
   }
 
@@ -771,13 +730,13 @@ public class YappingParser implements PsiParser, LightPsiParser {
 
   /* ********************************************************** */
   // jScopeSegment (spacing DOT spacing jScope)?
-  static boolean jScope(PsiBuilder b, int l) {
+  public static boolean jScope(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "jScope")) return false;
     boolean r;
-    Marker m = enter_section_(b);
+    Marker m = enter_section_(b, l, _NONE_, J_SCOPE, "<j scope>");
     r = jScopeSegment(b, l + 1);
     r = r && jScope_1(b, l + 1);
-    exit_section_(b, m, null, r);
+    exit_section_(b, l, m, r, false, null);
     return r;
   }
 
@@ -802,24 +761,26 @@ public class YappingParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // jSegmentSingle|jSegmentMulti
-  static boolean jScopeSegment(PsiBuilder b, int l) {
+  // jSegmentMulti|jSegmentSingle
+  public static boolean jScopeSegment(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "jScopeSegment")) return false;
     boolean r;
-    r = jSegmentSingle(b, l + 1);
-    if (!r) r = jSegmentMulti(b, l + 1);
+    Marker m = enter_section_(b, l, _NONE_, J_SCOPE_SEGMENT, "<j scope segment>");
+    r = jSegmentMulti(b, l + 1);
+    if (!r) r = jSegmentSingle(b, l + 1);
+    exit_section_(b, l, m, r, false, null);
     return r;
   }
 
   /* ********************************************************** */
   // containedSegment jSegmentInclJBody?
-  static boolean jSegmentExclJBody(PsiBuilder b, int l) {
+  public static boolean jSegmentExclJBody(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "jSegmentExclJBody")) return false;
     boolean r;
-    Marker m = enter_section_(b);
+    Marker m = enter_section_(b, l, _NONE_, J_SEGMENT_EXCL_J_BODY, "<j segment excl j body>");
     r = containedSegment(b, l + 1);
     r = r && jSegmentExclJBody_1(b, l + 1);
-    exit_section_(b, m, null, r);
+    exit_section_(b, l, m, r, false, null);
     return r;
   }
 
@@ -832,14 +793,14 @@ public class YappingParser implements PsiParser, LightPsiParser {
 
   /* ********************************************************** */
   // (JBODY jSegmentExclJBody?)
-  //         | jSegmentExclJBody
-  static boolean jSegmentInclJBody(PsiBuilder b, int l) {
+  //             | jSegmentExclJBody
+  public static boolean jSegmentInclJBody(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "jSegmentInclJBody")) return false;
     boolean r;
-    Marker m = enter_section_(b);
+    Marker m = enter_section_(b, l, _NONE_, J_SEGMENT_INCL_J_BODY, "<j segment incl j body>");
     r = jSegmentInclJBody_0(b, l + 1);
     if (!r) r = jSegmentExclJBody(b, l + 1);
-    exit_section_(b, m, null, r);
+    exit_section_(b, l, m, r, false, null);
     return r;
   }
 
@@ -864,13 +825,13 @@ public class YappingParser implements PsiParser, LightPsiParser {
   /* ********************************************************** */
   // (JNAME jSegmentExclJBody)
   //         | (containedSegment jSegmentInclJBody)
-  static boolean jSegmentMulti(PsiBuilder b, int l) {
+  public static boolean jSegmentMulti(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "jSegmentMulti")) return false;
     boolean r;
-    Marker m = enter_section_(b);
+    Marker m = enter_section_(b, l, _NONE_, J_SEGMENT_MULTI, "<j segment multi>");
     r = jSegmentMulti_0(b, l + 1);
     if (!r) r = jSegmentMulti_1(b, l + 1);
-    exit_section_(b, m, null, r);
+    exit_section_(b, l, m, r, false, null);
     return r;
   }
 
@@ -898,23 +859,27 @@ public class YappingParser implements PsiParser, LightPsiParser {
 
   /* ********************************************************** */
   // JNAME | containedSegment
-  static boolean jSegmentSingle(PsiBuilder b, int l) {
+  public static boolean jSegmentSingle(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "jSegmentSingle")) return false;
     boolean r;
+    Marker m = enter_section_(b, l, _NONE_, J_SEGMENT_SINGLE, "<j segment single>");
     r = consumeToken(b, JNAME);
     if (!r) r = containedSegment(b, l + 1);
+    exit_section_(b, l, m, r, false, null);
     return r;
   }
 
   /* ********************************************************** */
   // (WHITESPACE|COMMENT)*
-  static boolean spacing(PsiBuilder b, int l) {
+  public static boolean spacing(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "spacing")) return false;
+    Marker m = enter_section_(b, l, _NONE_, SPACING, "<spacing>");
     while (true) {
       int c = current_position_(b);
       if (!spacing_0(b, l + 1)) break;
       if (!empty_element_parsed_guard_(b, "spacing", c)) break;
     }
+    exit_section_(b, l, m, true, false, null);
     return true;
   }
 
@@ -1000,24 +965,24 @@ public class YappingParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // (YNAME|NATURAL|containedSegmentQ|ySegmentMulti) (spacing DOT spacing yPathRest)?
-  static boolean yPathRest(PsiBuilder b, int l) {
+  // (YNAME|NATURAL|containedSegment|ySegmentMulti) (spacing DOT spacing yPathRest)?
+  public static boolean yPathRest(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "yPathRest")) return false;
     boolean r;
-    Marker m = enter_section_(b);
+    Marker m = enter_section_(b, l, _COLLAPSE_, Y_PATH_REST, "<y path rest>");
     r = yPathRest_0(b, l + 1);
     r = r && yPathRest_1(b, l + 1);
-    exit_section_(b, m, null, r);
+    exit_section_(b, l, m, r, false, null);
     return r;
   }
 
-  // YNAME|NATURAL|containedSegmentQ|ySegmentMulti
+  // YNAME|NATURAL|containedSegment|ySegmentMulti
   private static boolean yPathRest_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "yPathRest_0")) return false;
     boolean r;
     r = consumeToken(b, YNAME);
     if (!r) r = consumeToken(b, NATURAL);
-    if (!r) r = containedSegmentQ(b, l + 1);
+    if (!r) r = containedSegment(b, l + 1);
     if (!r) r = ySegmentMulti(b, l + 1);
     return r;
   }
@@ -1043,25 +1008,27 @@ public class YappingParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // ySegmentMulti | YNAME | containedSegmentQ
-  static boolean ySegmentExclNat(PsiBuilder b, int l) {
+  // ySegmentMulti | YNAME | containedSegment
+  public static boolean ySegmentExclNat(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "ySegmentExclNat")) return false;
     boolean r;
+    Marker m = enter_section_(b, l, _NONE_, Y_SEGMENT_EXCL_NAT, "<y segment excl nat>");
     r = ySegmentMulti(b, l + 1);
     if (!r) r = consumeToken(b, YNAME);
-    if (!r) r = containedSegmentQ(b, l + 1);
+    if (!r) r = containedSegment(b, l + 1);
+    exit_section_(b, l, m, r, false, null);
     return r;
   }
 
   /* ********************************************************** */
-  // containedSegmentQ ySegmentInclVals?
-  static boolean ySegmentExclVals(PsiBuilder b, int l) {
+  // containedSegment ySegmentInclVals?
+  public static boolean ySegmentExclVals(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "ySegmentExclVals")) return false;
     boolean r;
-    Marker m = enter_section_(b);
-    r = containedSegmentQ(b, l + 1);
+    Marker m = enter_section_(b, l, _NONE_, Y_SEGMENT_EXCL_VALS, "<y segment excl vals>");
+    r = containedSegment(b, l + 1);
     r = r && ySegmentExclVals_1(b, l + 1);
-    exit_section_(b, m, null, r);
+    exit_section_(b, l, m, r, false, null);
     return r;
   }
 
@@ -1075,13 +1042,13 @@ public class YappingParser implements PsiParser, LightPsiParser {
   /* ********************************************************** */
   // ((NATURAL|YBODY) ySegmentExclVals?)
   //         | ySegmentExclVals
-  static boolean ySegmentInclVals(PsiBuilder b, int l) {
+  public static boolean ySegmentInclVals(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "ySegmentInclVals")) return false;
     boolean r;
-    Marker m = enter_section_(b);
+    Marker m = enter_section_(b, l, _NONE_, Y_SEGMENT_INCL_VALS, "<y segment incl vals>");
     r = ySegmentInclVals_0(b, l + 1);
     if (!r) r = ySegmentExclVals(b, l + 1);
-    exit_section_(b, m, null, r);
+    exit_section_(b, l, m, r, false, null);
     return r;
   }
 
@@ -1113,24 +1080,24 @@ public class YappingParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // (containedSegmentQ ySegmentInclVals)
+  // (containedSegment ySegmentInclVals)
   //         | ((YNAME|NATURAL) ySegmentExclVals)
-  static boolean ySegmentMulti(PsiBuilder b, int l) {
+  public static boolean ySegmentMulti(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "ySegmentMulti")) return false;
     boolean r;
-    Marker m = enter_section_(b);
+    Marker m = enter_section_(b, l, _NONE_, Y_SEGMENT_MULTI, "<y segment multi>");
     r = ySegmentMulti_0(b, l + 1);
     if (!r) r = ySegmentMulti_1(b, l + 1);
-    exit_section_(b, m, null, r);
+    exit_section_(b, l, m, r, false, null);
     return r;
   }
 
-  // containedSegmentQ ySegmentInclVals
+  // containedSegment ySegmentInclVals
   private static boolean ySegmentMulti_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "ySegmentMulti_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = containedSegmentQ(b, l + 1);
+    r = containedSegment(b, l + 1);
     r = r && ySegmentInclVals(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
@@ -1157,32 +1124,62 @@ public class YappingParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // item* Properties?
+  // (Properties|(item yapping))?
   static boolean yapping(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "yapping")) return false;
+    yapping_0(b, l + 1);
+    return true;
+  }
+
+  // Properties|(item yapping)
+  private static boolean yapping_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "yapping_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = yapping_0(b, l + 1);
-    r = r && yapping_1(b, l + 1);
+    r = Properties(b, l + 1);
+    if (!r) r = yapping_0_1(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
-  // item*
-  private static boolean yapping_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "yapping_0")) return false;
-    while (true) {
-      int c = current_position_(b);
-      if (!item(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "yapping_0", c)) break;
-    }
-    return true;
+  // item yapping
+  private static boolean yapping_0_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "yapping_0_1")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = item(b, l + 1);
+    r = r && yapping(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
   }
 
-  // Properties?
-  private static boolean yapping_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "yapping_1")) return false;
-    Properties(b, l + 1);
+  /* ********************************************************** */
+  // Properties|(item yapping_?)
+  public static boolean yapping_(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "yapping_")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, YAPPING_, "<yapping>");
+    r = Properties(b, l + 1);
+    if (!r) r = yapping__1(b, l + 1);
+    exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  // item yapping_?
+  private static boolean yapping__1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "yapping__1")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = item(b, l + 1);
+    r = r && yapping__1_1(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // yapping_?
+  private static boolean yapping__1_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "yapping__1_1")) return false;
+    yapping_(b, l + 1);
     return true;
   }
 

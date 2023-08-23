@@ -27,4 +27,16 @@ public class YappingIntegerImpl extends ASTWrapperPsiElement implements YappingI
     else super.accept(visitor);
   }
 
+  @Override
+  @Nullable
+  public YappingSign getSign() {
+    return findChildByClass(YappingSign.class);
+  }
+
+  @Override
+  @Nullable
+  public YappingSpacing getSpacing() {
+    return findChildByClass(YappingSpacing.class);
+  }
+
 }

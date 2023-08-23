@@ -8,9 +8,12 @@ import com.intellij.psi.PsiElement;
 public interface YappingProperties extends PsiElement {
 
   @NotNull
-  List<YappingBaseData> getBaseDataList();
+  YappingBaseData getBaseData();
 
   @NotNull
-  List<YappingItem> getItemList();
+  YappingSpacing getSpacing();
+
+  @Nullable
+  YappingYapping_ getYapping_();
 
 }

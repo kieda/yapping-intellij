@@ -29,14 +29,20 @@ public class YappingPropertiesImpl extends ASTWrapperPsiElement implements Yappi
 
   @Override
   @NotNull
-  public List<YappingBaseData> getBaseDataList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, YappingBaseData.class);
+  public YappingBaseData getBaseData() {
+    return findNotNullChildByClass(YappingBaseData.class);
   }
 
   @Override
   @NotNull
-  public List<YappingItem> getItemList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, YappingItem.class);
+  public YappingSpacing getSpacing() {
+    return findNotNullChildByClass(YappingSpacing.class);
+  }
+
+  @Override
+  @Nullable
+  public YappingYapping_ getYapping_() {
+    return findChildByClass(YappingYapping_.class);
   }
 
 }

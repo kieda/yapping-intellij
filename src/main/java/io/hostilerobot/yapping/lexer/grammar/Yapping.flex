@@ -13,6 +13,7 @@ import io.hostilerobot.yapping.parser.YappingTypes;import java.nio.file.Path;imp
 %function advance
 %type IElementType
 //%cup
+%debug
 %char
 %line
 %column
@@ -40,33 +41,64 @@ private Deque<PathContext> context = new ArrayDeque<>();
   context.push(PathContext.YAPPING);
 }
 
+private String getStateName(int state) {
+    switch(state) {
+        case AFTER_JSCOPE: return "AFTER_JSCOPE";
+        case AFTER_SLASH: return "AFTER_SLASH";
+        case BEFORE_JSCOPE: return "BEFORE_JSCOPE";
+        case BEFORE_SLASH: return "BEFORE_SLASH";
+        case PENDING_JSCOPE: return "PENDING_JSCOPE";
+        case PENDING_SLASH: return "PENDING_SLASH";
+        case LITERAL: return "LITERAL";
+        case REGEX: return "REGEX";
+        case REGEX_CLASS: return "REGEX_CLASS";
+        case YYINITIAL: return "YYINITIAL";
+        default: return "ERROR_UNKNOWN_STATE";
+    }
+}
+
+private void debugCurrentState(String methodName) {
+    System.out.println(
+        methodName + ": " + getStateName(yystate()) + ": " + context
+    );
+}
+
 private int getCurrentFallback() {
+    debugCurrentState("getCurrentFallback");
     return context.peek().fallback;
 }
 // file path interrupts the current segment and starts a new one that's file
 // @asdf!asdf asdf!asdf !asdf !asdf
 private void startNewFilePath() {
+    debugCurrentState("START startNewFilePath");
     endCurrentPath();
     context.push(PathContext.FILE);
     yybegin(PathContext.FILE.initialState);
+    debugCurrentState("END startNewFilePath");
 }
 private void startNewJavaPath() {
+    debugCurrentState("START startNewJavaPath");
     endCurrentPath();
     context.push(PathContext.JAVA);
     yybegin(PathContext.JAVA.initialState);
+    debugCurrentState("END startNewJavaPath");
 }
 
 // new path that starts with a regex
 private void startNewYappingPathRegexStart() {
+    debugCurrentState("START startNewYappingPathRegexStart");
     endCurrentPath();
     yybegin(REGEX);
+    debugCurrentState("END startNewYappingPathRegexStart");
 }
 // new path that starts with a literal
 // !asdf "asdf"
 //       ^
 private void startNewYappingPathLiteralStart() {
+    debugCurrentState("START startNewYappingPathLiteralStart");
     endCurrentPath();
     yybegin(LITERAL);
+    debugCurrentState("END startNewYappingPathLiteralStart");
 }
 
 // open parentheses on a new yapping path, e.g. [ ( {
@@ -75,8 +107,10 @@ private void startNewYappingPathLiteralStart() {
 // !asdf ( .. )
 //       ^
 private void startNewYappingPathOpenStart() {
+    debugCurrentState("START startNewYappingPathOpenStart");
     startNewYappingPath();
     context.push(PathContext.YAPPING);
+    debugCurrentState("END startNewYappingPathOpenStart");
 }
 
 // asdf asdf
@@ -88,8 +122,10 @@ private void startNewYappingPathOpenStart() {
 // @asdf, asdf
 //      ^
 private void startNewYappingPath() {
+    debugCurrentState("START startNewYappingPath");
     endCurrentPath();
     yybegin(YYINITIAL);
+    debugCurrentState("END startNewYappingPath");
 }
 
 // ends the current segment
@@ -107,13 +143,16 @@ private void endCurrentPath() {
 }
 
 private void openYappingSegment() {
+    debugCurrentState("START openYappingSegment");
     // encounter a (, {, or [ while in a segment
     context.push(PathContext.YAPPING);
     if(yystate() != PathContext.YAPPING.initialState) {
         yybegin(PathContext.YAPPING.initialState);
     }
+    debugCurrentState("END openYappingSegment");
 }
 private void closeCurrentSegment() {
+    debugCurrentState("START closeCurrentSegment");
     // encounter ), ], or }
     if(context.size() > 1 && context.peek() == PathContext.YAPPING) {
         context.pop();
@@ -150,6 +189,11 @@ private void closeCurrentSegment() {
     // todo - should we throw if we encounter mismatched segments?
     //        ex: asdf)asdf
     //        currently we just fall back to YAPPING and let the parser deal with it
+    debugCurrentState("END closeCurrentSegment");
+}
+
+private static String zzToPrintable(CharSequence cs) {
+    return zzToPrintable(cs.toString());
 }
 %}
 
@@ -157,7 +201,7 @@ private void closeCurrentSegment() {
 %eof}
 LineTerminator = \r|\n|\r\n
 //InputCharacter = [^\r\n\t\f\ \#]
-WHITESPACE     = {LineTerminator} | [ \t\f]
+WHITESPACE     = ({LineTerminator} | [ \t\f])+
 COMMENT        = "#"[^\r\n]*{LineTerminator}?
 
 FNAMECHAR      = [^\/\"\`\!\@\,\r\n\t\f\=\-\:\;\ \#\[\]\(\)\{\}\<\>]
@@ -173,7 +217,7 @@ FNAME          = !(!(({FNAMECHAR}|\-)+)|(({FNAMECHAR}|\-) "->"))
 // !{FNAMECHAR} = a [\/\"\`\!\@\r\n\t\f\-\ \#\[\]\(\)\{\}\<\>] [^]*
 //
 YBODYCHAR      = //[[{FNAMECHAR}] && [^\&\+\'\$\|\~\*\^\%\\\?\%\.]]
-    [^\/\"\`\!\@\,\r\n\t\f\=\-\:\;\ \#\[\]\(\)\{\}\<\>\&\+\'\$\|\~\*\^\%\\\?\%\.];
+    [^\/\"\`\!\@\,\r\n\t\f\=\-\:\;\ \#\[\]\(\)\{\}\<\>\&\+\'\$\|\~\*\^\%\\\?\%\.]
 YFIRSTCHAR     = //[{YFIRSTCHAR} && [^0-9]]
     [^\/\"\`\!\@\,\r\n\t\f\=\-\:\;\ \#\[\]\(\)\{\}\<\>\&\+\'\$\|\~\*\^\%\\\?\%\.0-9]
 //YFIRSTCHAR     = [^\/\"\'\`\!\@\r\n\t\f\ \#\[\]\(\)\{\}\<\>\:\&\+\;\|\=\,\~\*\^\%\\\?\%\.[0-9]]
@@ -294,9 +338,10 @@ TRANSITION_SEP_R="->"
     {WHITESPACE}                                    { return TokenType.WHITE_SPACE; }
     // parts in yapping paths
     {YNAME}                                         { return YappingTypes.YNAME; }
-    {YBODY}                                         { return YappingTypes.YBODY; }
     {NATURAL}                                       { return YappingTypes.NATURAL; }
+    {YBODY}                                         { return YappingTypes.YBODY; }
     {DOT}                                           { return YappingTypes.DOT; }
+    {SLASH}                                         { return YappingTypes.SLASH; }
 }
 // DEFAULT 4: items in a path that can be followed by . or /
 <YYINITIAL, BEFORE_SLASH, BEFORE_JSCOPE, AFTER_JSCOPE, AFTER_SLASH> {

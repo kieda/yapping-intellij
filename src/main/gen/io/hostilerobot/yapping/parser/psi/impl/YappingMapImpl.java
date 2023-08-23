@@ -33,4 +33,10 @@ public class YappingMapImpl extends ASTWrapperPsiElement implements YappingMap {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, YappingPairBounded.class);
   }
 
+  @Override
+  @NotNull
+  public List<YappingSpacing> getSpacingList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, YappingSpacing.class);
+  }
+
 }

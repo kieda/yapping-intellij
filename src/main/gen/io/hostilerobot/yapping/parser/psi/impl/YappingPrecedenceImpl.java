@@ -33,4 +33,10 @@ public class YappingPrecedenceImpl extends ASTWrapperPsiElement implements Yappi
     return findNotNullChildByClass(YappingBoundedData.class);
   }
 
+  @Override
+  @NotNull
+  public List<YappingSpacing> getSpacingList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, YappingSpacing.class);
+  }
+
 }

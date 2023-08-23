@@ -39,6 +39,10 @@ public class YappingVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitPairExpr(@NotNull YappingPairExpr o) {
+    visitPsiElement(o);
+  }
+
   public void visitPrecedence(@NotNull YappingPrecedence o) {
     visitPsiElement(o);
   }
@@ -55,11 +59,11 @@ public class YappingVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
-  public void visitSectionData(@NotNull YappingSectionData o) {
+  public void visitSign(@NotNull YappingSign o) {
     visitPsiElement(o);
   }
 
-  public void visitTransitionL(@NotNull YappingTransitionL o) {
+  public void visitSectionData(@NotNull YappingSectionData o) {
     visitPsiElement(o);
   }
 
@@ -67,7 +71,7 @@ public class YappingVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
-  public void visitTransitionR(@NotNull YappingTransitionR o) {
+  public void visitTransitionLExpr(@NotNull YappingTransitionLExpr o) {
     visitPsiElement(o);
   }
 
@@ -75,7 +79,39 @@ public class YappingVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitTransitionRExpr(@NotNull YappingTransitionRExpr o) {
+    visitPsiElement(o);
+  }
+
+  public void visitContainedSegment(@NotNull YappingContainedSegment o) {
+    visitPsiElement(o);
+  }
+
   public void visitFPath(@NotNull YappingFPath o) {
+    visitPsiElement(o);
+  }
+
+  public void visitFScope(@NotNull YappingFScope o) {
+    visitPsiElement(o);
+  }
+
+  public void visitFScopeSegment(@NotNull YappingFScopeSegment o) {
+    visitPsiElement(o);
+  }
+
+  public void visitFSegmentExclFName(@NotNull YappingFSegmentExclFName o) {
+    visitPsiElement(o);
+  }
+
+  public void visitFSegmentInclFName(@NotNull YappingFSegmentInclFName o) {
+    visitPsiElement(o);
+  }
+
+  public void visitFSegmentMulti(@NotNull YappingFSegmentMulti o) {
+    visitPsiElement(o);
+  }
+
+  public void visitFSegmentSingle(@NotNull YappingFSegmentSingle o) {
     visitPsiElement(o);
   }
 
@@ -87,7 +123,59 @@ public class YappingVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitJScope(@NotNull YappingJScope o) {
+    visitPsiElement(o);
+  }
+
+  public void visitJScopeSegment(@NotNull YappingJScopeSegment o) {
+    visitPsiElement(o);
+  }
+
+  public void visitJSegmentExclJBody(@NotNull YappingJSegmentExclJBody o) {
+    visitPsiElement(o);
+  }
+
+  public void visitJSegmentInclJBody(@NotNull YappingJSegmentInclJBody o) {
+    visitPsiElement(o);
+  }
+
+  public void visitJSegmentMulti(@NotNull YappingJSegmentMulti o) {
+    visitPsiElement(o);
+  }
+
+  public void visitJSegmentSingle(@NotNull YappingJSegmentSingle o) {
+    visitPsiElement(o);
+  }
+
+  public void visitSpacing(@NotNull YappingSpacing o) {
+    visitPsiElement(o);
+  }
+
   public void visitYPath1(@NotNull YappingYPath1 o) {
+    visitPsiElement(o);
+  }
+
+  public void visitYPathRest(@NotNull YappingYPathRest o) {
+    visitPsiElement(o);
+  }
+
+  public void visitYSegmentExclNat(@NotNull YappingYSegmentExclNat o) {
+    visitPsiElement(o);
+  }
+
+  public void visitYSegmentExclVals(@NotNull YappingYSegmentExclVals o) {
+    visitPsiElement(o);
+  }
+
+  public void visitYSegmentInclVals(@NotNull YappingYSegmentInclVals o) {
+    visitPsiElement(o);
+  }
+
+  public void visitYSegmentMulti(@NotNull YappingYSegmentMulti o) {
+    visitPsiElement(o);
+  }
+
+  public void visitYapping_(@NotNull YappingYapping_ o) {
     visitPsiElement(o);
   }
 

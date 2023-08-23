@@ -29,20 +29,20 @@ public class YappingTransitionRBoundedImpl extends ASTWrapperPsiElement implemen
 
   @Override
   @NotNull
-  public List<YappingBaseData> getBaseDataList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, YappingBaseData.class);
+  public YappingBaseData getBaseData() {
+    return findNotNullChildByClass(YappingBaseData.class);
   }
 
   @Override
-  @Nullable
-  public YappingProperties getProperties() {
-    return findChildByClass(YappingProperties.class);
+  @NotNull
+  public YappingBoundedData getBoundedData() {
+    return findNotNullChildByClass(YappingBoundedData.class);
   }
 
   @Override
-  @Nullable
-  public YappingTransitionRBounded getTransitionRBounded() {
-    return findChildByClass(YappingTransitionRBounded.class);
+  @NotNull
+  public List<YappingSpacing> getSpacingList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, YappingSpacing.class);
   }
 
 }

@@ -39,10 +39,4 @@ public class YappingSectionDataImpl extends ASTWrapperPsiElement implements Yapp
     return findChildByClass(YappingPair.class);
   }
 
-  @Override
-  @Nullable
-  public YappingTransitionR getTransitionR() {
-    return findChildByClass(YappingTransitionR.class);
-  }
-
 }

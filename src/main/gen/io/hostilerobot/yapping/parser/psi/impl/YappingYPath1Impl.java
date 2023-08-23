@@ -29,26 +29,20 @@ public class YappingYPath1Impl extends ASTWrapperPsiElement implements YappingYP
 
   @Override
   @NotNull
-  public List<YappingList> getListList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, YappingList.class);
+  public List<YappingSpacing> getSpacingList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, YappingSpacing.class);
+  }
+
+  @Override
+  @Nullable
+  public YappingYPathRest getYPathRest() {
+    return findChildByClass(YappingYPathRest.class);
   }
 
   @Override
   @NotNull
-  public List<YappingMap> getMapList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, YappingMap.class);
-  }
-
-  @Override
-  @NotNull
-  public List<YappingPrecedence> getPrecedenceList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, YappingPrecedence.class);
-  }
-
-  @Override
-  @NotNull
-  public List<YappingQuotient> getQuotientList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, YappingQuotient.class);
+  public YappingYSegmentExclNat getYSegmentExclNat() {
+    return findNotNullChildByClass(YappingYSegmentExclNat.class);
   }
 
 }

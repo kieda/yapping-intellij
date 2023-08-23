@@ -33,4 +33,16 @@ public class YappingRealImpl extends ASTWrapperPsiElement implements YappingReal
     return findNotNullChildByClass(YappingDecimal.class);
   }
 
+  @Override
+  @Nullable
+  public YappingSign getSign() {
+    return findChildByClass(YappingSign.class);
+  }
+
+  @Override
+  @Nullable
+  public YappingSpacing getSpacing() {
+    return findChildByClass(YappingSpacing.class);
+  }
+
 }

@@ -10,4 +10,7 @@ public interface YappingQuotient extends PsiElement {
   @NotNull
   List<YappingInteger> getIntegerList();
 
+  @NotNull
+  List<YappingSpacing> getSpacingList();
+
 }

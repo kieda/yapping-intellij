@@ -28,27 +28,27 @@ public class YappingPairImpl extends ASTWrapperPsiElement implements YappingPair
   }
 
   @Override
-  @NotNull
-  public List<YappingBaseData> getBaseDataList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, YappingBaseData.class);
+  @Nullable
+  public YappingBaseData getBaseData() {
+    return findChildByClass(YappingBaseData.class);
   }
 
   @Override
   @Nullable
-  public YappingPair getPair() {
-    return findChildByClass(YappingPair.class);
+  public YappingPairExpr getPairExpr() {
+    return findChildByClass(YappingPairExpr.class);
   }
 
   @Override
-  @NotNull
-  public List<YappingTransitionL> getTransitionLList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, YappingTransitionL.class);
+  @Nullable
+  public YappingTransitionLExpr getTransitionLExpr() {
+    return findChildByClass(YappingTransitionLExpr.class);
   }
 
   @Override
-  @NotNull
-  public List<YappingTransitionR> getTransitionRList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, YappingTransitionR.class);
+  @Nullable
+  public YappingTransitionRExpr getTransitionRExpr() {
+    return findChildByClass(YappingTransitionRExpr.class);
   }
 
 }

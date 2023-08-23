@@ -5,12 +5,15 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface YappingTransitionR extends PsiElement {
-
-  @NotNull
-  List<YappingBaseData> getBaseDataList();
+public interface YappingJScope extends PsiElement {
 
   @Nullable
-  YappingTransitionR getTransitionR();
+  YappingJScope getJScope();
+
+  @NotNull
+  YappingJScopeSegment getJScopeSegment();
+
+  @NotNull
+  List<YappingSpacing> getSpacingList();
 
 }

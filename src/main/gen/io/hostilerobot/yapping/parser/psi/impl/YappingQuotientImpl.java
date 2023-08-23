@@ -33,4 +33,10 @@ public class YappingQuotientImpl extends ASTWrapperPsiElement implements Yapping
     return PsiTreeUtil.getChildrenOfTypeAsList(this, YappingInteger.class);
   }
 
+  @Override
+  @NotNull
+  public List<YappingSpacing> getSpacingList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, YappingSpacing.class);
+  }
+
 }

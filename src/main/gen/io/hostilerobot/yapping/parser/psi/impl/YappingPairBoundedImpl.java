@@ -41,14 +41,20 @@ public class YappingPairBoundedImpl extends ASTWrapperPsiElement implements Yapp
 
   @Override
   @Nullable
-  public YappingTransitionL getTransitionL() {
-    return findChildByClass(YappingTransitionL.class);
+  public YappingTransitionLExpr getTransitionLExpr() {
+    return findChildByClass(YappingTransitionLExpr.class);
   }
 
   @Override
   @Nullable
-  public YappingTransitionR getTransitionR() {
-    return findChildByClass(YappingTransitionR.class);
+  public YappingTransitionRExpr getTransitionRExpr() {
+    return findChildByClass(YappingTransitionRExpr.class);
+  }
+
+  @Override
+  @NotNull
+  public List<YappingSpacing> getSpacingList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, YappingSpacing.class);
   }
 
 }

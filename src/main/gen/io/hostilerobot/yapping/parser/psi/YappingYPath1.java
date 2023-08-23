@@ -8,15 +8,12 @@ import com.intellij.psi.PsiElement;
 public interface YappingYPath1 extends PsiElement {
 
   @NotNull
-  List<YappingList> getListList();
+  List<YappingSpacing> getSpacingList();
+
+  @Nullable
+  YappingYPathRest getYPathRest();
 
   @NotNull
-  List<YappingMap> getMapList();
-
-  @NotNull
-  List<YappingPrecedence> getPrecedenceList();
-
-  @NotNull
-  List<YappingQuotient> getQuotientList();
+  YappingYSegmentExclNat getYSegmentExclNat();
 
 }

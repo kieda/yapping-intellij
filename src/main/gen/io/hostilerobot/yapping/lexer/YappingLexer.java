@@ -16,6 +16,7 @@ class YappingLexer implements FlexLexer {
 
   /** initial size of the lookahead buffer */
   private static final int ZZ_BUFFERSIZE = 16384;
+  private static final String ZZ_NL = System.getProperty("line.separator");
 
   /** lexical states */
   public static final int YYINITIAL = 0;
@@ -345,17 +346,17 @@ class YappingLexer implements FlexLexer {
   private static final int [] ZZ_ACTION = zzUnpackAction();
 
   private static final String ZZ_ACTION_PACKED_0 =
-    "\12\0\1\1\2\2\1\3\1\4\1\5\1\6\1\7"+
+    "\12\0\1\1\1\2\1\3\1\4\1\5\1\6\1\7"+
     "\1\10\1\11\1\12\1\13\1\14\1\15\1\16\1\17"+
-    "\1\6\1\20\1\21\1\22\1\23\1\24\1\25\1\26"+
-    "\1\27\1\30\1\6\1\27\1\31\1\6\1\32\1\27"+
-    "\1\33\2\34\1\35\1\33\1\36\1\37\1\40\1\41"+
-    "\1\42\1\43\1\44\1\45\1\46\1\47\1\50\2\51"+
-    "\1\52\1\53\1\54\1\0\1\55\2\5\1\56\1\16"+
-    "\1\57\1\27\2\35\1\0\2\52\1\1\1\0";
+    "\1\20\1\6\1\21\1\22\1\23\1\24\1\25\1\26"+
+    "\1\27\1\30\1\31\1\6\1\30\1\32\1\6\1\33"+
+    "\1\30\1\34\1\35\1\36\1\34\1\37\1\40\1\41"+
+    "\1\42\1\43\1\44\1\45\1\46\1\47\1\50\1\51"+
+    "\1\52\1\53\1\54\2\5\1\55\1\56\1\57\1\30"+
+    "\2\36\2\52";
 
   private static int [] zzUnpackAction() {
-    int [] result = new int[78];
+    int [] result = new int[70];
     int offset = 0;
     offset = zzUnpackAction(ZZ_ACTION_PACKED_0, offset, result);
     return result;
@@ -381,18 +382,17 @@ class YappingLexer implements FlexLexer {
 
   private static final String ZZ_ROWMAP_PACKED_0 =
     "\0\0\0\40\0\100\0\140\0\200\0\240\0\300\0\340"+
-    "\0\u0100\0\u0120\0\u0140\0\u0160\0\u0180\0\u0160\0\u0160\0\u01a0"+
-    "\0\u0160\0\u0160\0\u0160\0\u0160\0\u0160\0\u0160\0\u01c0\0\u0160"+
-    "\0\u01e0\0\u0160\0\u0200\0\u0160\0\u0160\0\u0160\0\u0160\0\u0160"+
-    "\0\u0160\0\u0160\0\u0220\0\u0160\0\u0240\0\u0260\0\u0160\0\u0280"+
-    "\0\u0160\0\u02a0\0\u02c0\0\u0160\0\u02e0\0\u0300\0\u0320\0\u0160"+
-    "\0\u0340\0\u0160\0\u0360\0\u0160\0\u0160\0\u0380\0\u0160\0\u0160"+
-    "\0\u0160\0\u03a0\0\u0160\0\u03c0\0\u03e0\0\u0160\0\u0400\0\u0420"+
-    "\0\u0440\0\u0160\0\u0460\0\u0160\0\u0480\0\u0160\0\u0160\0\u0160"+
-    "\0\u04a0\0\u04c0\0\u0160\0\u04e0\0\u0500\0\u0520";
+    "\0\u0100\0\u0120\0\u0140\0\u0160\0\u0180\0\u0180\0\u01a0\0\u0180"+
+    "\0\u0180\0\u0180\0\u0180\0\u0180\0\u0180\0\u01c0\0\u0180\0\u0180"+
+    "\0\u01e0\0\u0180\0\u0200\0\u0180\0\u0180\0\u0180\0\u0180\0\u0180"+
+    "\0\u0180\0\u0180\0\u0220\0\u0180\0\u0240\0\u0260\0\u0180\0\u0280"+
+    "\0\u0180\0\u02a0\0\u02c0\0\u02e0\0\u0300\0\u0320\0\u0180\0\u0340"+
+    "\0\u0360\0\u0180\0\u0180\0\u0380\0\u0180\0\u0180\0\u0180\0\u03a0"+
+    "\0\u03c0\0\u03e0\0\u0180\0\u0400\0\u0180\0\u0420\0\u0180\0\u0440"+
+    "\0\u0180\0\u0180\0\u0180\0\u0460\0\u0180\0\u0480";
 
   private static int [] zzUnpackRowMap() {
-    int [] result = new int[78];
+    int [] result = new int[70];
     int offset = 0;
     offset = zzUnpackRowMap(ZZ_ROWMAP_PACKED_0, offset, result);
     return result;
@@ -415,56 +415,55 @@ class YappingLexer implements FlexLexer {
   private static final int [] ZZ_TRANS = zzUnpacktrans();
 
   private static final String ZZ_TRANS_PACKED_0 =
-    "\1\13\2\14\1\13\1\15\1\16\1\17\1\20\2\21"+
-    "\1\22\1\23\1\24\1\25\1\26\1\27\1\30\1\21"+
-    "\1\31\1\32\1\21\1\33\1\34\1\21\1\35\1\13"+
-    "\1\36\1\21\1\37\1\40\1\41\1\42\6\43\1\44"+
+    "\1\13\2\14\1\13\1\14\1\15\1\16\1\17\2\20"+
+    "\1\21\1\22\1\23\1\24\1\25\1\26\1\27\1\30"+
+    "\1\31\1\32\1\20\1\33\1\34\1\20\1\35\1\13"+
+    "\1\36\1\20\1\37\1\40\1\41\1\42\6\43\1\44"+
     "\24\43\1\45\4\43\32\46\1\47\1\50\1\46\1\51"+
     "\2\46\33\52\1\45\1\40\3\52\1\53\2\54\1\53"+
-    "\1\55\1\16\1\17\1\56\3\53\1\23\1\24\1\53"+
-    "\1\26\1\57\1\53\1\60\1\53\1\32\1\21\1\33"+
-    "\1\34\1\21\1\35\1\53\1\36\1\53\1\37\1\40"+
-    "\1\41\1\42\1\61\2\14\1\61\1\15\1\21\1\17"+
-    "\1\20\3\61\1\23\1\24\1\61\1\21\2\61\1\62"+
-    "\1\61\6\21\1\61\1\36\1\61\1\37\1\40\1\41"+
-    "\1\42\1\63\2\14\1\63\1\15\1\16\1\64\1\20"+
-    "\2\21\1\22\1\65\1\24\1\25\1\26\1\27\1\21"+
-    "\1\60\1\66\1\32\1\21\1\33\1\34\1\21\1\35"+
-    "\1\63\1\67\1\21\1\37\1\70\1\71\1\42\1\72"+
-    "\2\73\1\21\1\74\1\16\1\17\1\75\1\72\1\21"+
-    "\1\22\1\23\1\24\1\25\1\26\1\27\1\76\1\21"+
-    "\1\72\1\32\1\21\1\33\1\34\1\21\1\35\1\72"+
-    "\1\36\1\21\1\37\1\40\1\41\1\42\1\21\2\14"+
-    "\1\21\1\15\1\21\1\17\1\20\1\77\2\21\1\23"+
-    "\1\24\14\21\1\77\1\36\1\21\1\37\1\40\1\41"+
-    "\1\42\1\63\2\14\1\63\1\15\1\16\1\64\1\20"+
-    "\2\21\1\22\1\65\1\24\1\25\1\26\1\27\1\76"+
-    "\1\21\1\66\1\32\1\21\1\33\1\34\1\21\1\35"+
-    "\1\63\1\67\1\21\1\37\1\70\1\71\1\42\1\100"+
-    "\2\0\1\100\16\0\1\100\1\0\1\101\4\0\1\100"+
-    "\50\0\1\14\35\0\2\20\1\102\1\20\1\103\33\20"+
-    "\27\0\1\104\32\0\1\105\1\0\1\101\32\0\1\106"+
-    "\20\0\6\43\1\0\24\43\1\0\4\43\40\107\32\46"+
-    "\2\0\1\46\1\0\2\46\32\107\1\40\2\107\1\40"+
-    "\2\107\33\52\2\0\3\52\1\53\2\0\1\53\4\0"+
-    "\3\53\2\0\1\53\1\0\2\53\1\0\1\53\6\0"+
-    "\1\53\1\0\1\53\6\0\1\54\35\0\2\56\1\110"+
-    "\1\56\1\111\33\56\1\53\2\0\1\53\4\0\3\53"+
-    "\2\0\1\53\1\0\2\53\1\0\1\53\4\0\1\104"+
-    "\1\0\1\53\1\0\1\53\4\0\1\61\2\0\1\61"+
-    "\4\0\3\61\2\0\1\61\1\0\2\61\1\0\1\61"+
-    "\6\0\1\61\1\0\1\61\4\0\1\112\2\0\1\112"+
-    "\16\0\1\112\6\0\1\112\30\0\1\66\15\0\1\72"+
-    "\7\0\1\72\11\0\1\72\6\0\1\72\10\0\1\73"+
-    "\35\0\2\75\1\113\1\75\1\114\33\75\1\77\7\0"+
-    "\1\77\11\0\1\77\6\0\1\77\32\0\1\115\13\0"+
-    "\1\116\2\0\1\116\16\0\1\116\6\0\1\116\10\0"+
-    "\1\102\57\0\1\105\17\0\1\110\61\0\1\63\15\0"+
-    "\1\113\35\0\1\100\2\0\1\100\16\0\1\100\6\0"+
-    "\1\100\32\0\1\101\13\0";
+    "\1\54\1\15\1\16\1\55\3\53\1\22\1\23\1\53"+
+    "\1\25\1\56\1\53\1\57\1\53\1\32\1\20\1\33"+
+    "\1\34\1\20\1\35\1\53\1\36\1\53\1\37\1\40"+
+    "\1\41\1\42\1\60\2\14\1\60\1\14\1\20\1\16"+
+    "\1\17\3\60\1\22\1\23\1\60\1\20\2\60\1\30"+
+    "\1\60\6\20\1\60\1\36\1\60\1\37\1\40\1\41"+
+    "\1\42\1\61\2\14\1\61\1\14\1\15\1\62\1\17"+
+    "\2\20\1\21\1\63\1\23\1\24\1\25\1\26\1\20"+
+    "\1\57\1\64\1\32\1\20\1\33\1\34\1\20\1\35"+
+    "\1\61\1\65\1\20\1\37\1\66\1\67\1\42\1\70"+
+    "\2\71\1\20\1\71\1\15\1\16\1\72\1\70\1\20"+
+    "\1\21\1\22\1\23\1\24\1\25\1\26\1\73\1\20"+
+    "\1\70\1\32\1\20\1\33\1\34\1\20\1\35\1\70"+
+    "\1\36\1\20\1\37\1\40\1\41\1\42\1\20\2\14"+
+    "\1\20\1\14\1\20\1\16\1\17\1\74\2\20\1\22"+
+    "\1\23\14\20\1\74\1\36\1\20\1\37\1\40\1\41"+
+    "\1\42\1\61\2\14\1\61\1\14\1\15\1\62\1\17"+
+    "\2\20\1\21\1\63\1\23\1\24\1\25\1\26\1\73"+
+    "\1\20\1\64\1\32\1\20\1\33\1\34\1\20\1\35"+
+    "\1\61\1\65\1\20\1\37\1\66\1\67\1\42\1\13"+
+    "\2\0\1\13\16\0\1\13\6\0\1\13\7\0\2\14"+
+    "\1\0\1\14\73\0\2\17\1\75\1\17\1\76\33\17"+
+    "\27\0\1\77\10\0\1\100\2\0\1\100\16\0\1\31"+
+    "\6\0\1\100\25\0\1\101\20\0\6\43\1\0\24\43"+
+    "\1\0\4\43\40\102\32\46\2\0\1\46\1\0\2\46"+
+    "\32\102\1\40\2\102\1\40\2\102\33\52\2\0\3\52"+
+    "\1\53\2\0\1\53\4\0\3\53\2\0\1\53\1\0"+
+    "\2\53\1\0\1\53\6\0\1\53\1\0\1\53\5\0"+
+    "\2\54\1\0\1\54\33\0\2\55\1\103\1\55\1\104"+
+    "\33\55\1\53\2\0\1\53\4\0\3\53\2\0\1\53"+
+    "\1\0\2\53\1\0\1\53\4\0\1\77\1\0\1\53"+
+    "\1\0\1\53\4\0\1\60\2\0\1\60\4\0\3\60"+
+    "\2\0\1\60\1\0\2\60\1\0\1\60\6\0\1\60"+
+    "\1\0\1\60\4\0\1\61\2\0\1\61\16\0\1\61"+
+    "\6\0\1\61\30\0\1\64\15\0\1\70\7\0\1\70"+
+    "\11\0\1\70\6\0\1\70\7\0\2\71\1\0\1\71"+
+    "\33\0\2\72\1\105\1\72\1\106\33\72\1\74\7\0"+
+    "\1\74\11\0\1\74\6\0\1\74\10\0\1\75\35\0"+
+    "\1\100\2\0\1\100\16\0\1\100\6\0\1\100\10\0"+
+    "\1\103\37\0\1\105\35\0";
 
   private static int [] zzUnpacktrans() {
-    int [] result = new int[1344];
+    int [] result = new int[1184];
     int offset = 0;
     offset = zzUnpacktrans(ZZ_TRANS_PACKED_0, offset, result);
     return result;
@@ -502,15 +501,14 @@ class YappingLexer implements FlexLexer {
   private static final int [] ZZ_ATTRIBUTE = zzUnpackAttribute();
 
   private static final String ZZ_ATTRIBUTE_PACKED_0 =
-    "\12\0\1\1\1\11\1\1\2\11\1\1\6\11\1\1"+
-    "\1\11\1\1\1\11\1\1\7\11\1\1\1\11\2\1"+
-    "\1\11\1\1\1\11\2\1\1\11\3\1\1\11\1\1"+
-    "\1\11\1\1\2\11\1\1\3\11\1\1\1\11\2\1"+
-    "\1\11\1\1\1\0\1\1\1\11\1\1\1\11\1\1"+
-    "\3\11\1\1\1\0\1\11\2\1\1\0";
+    "\12\0\2\1\2\11\1\1\6\11\1\1\2\11\1\1"+
+    "\1\11\1\1\7\11\1\1\1\11\2\1\1\11\1\1"+
+    "\1\11\5\1\1\11\2\1\2\11\1\1\3\11\3\1"+
+    "\1\11\1\1\1\11\1\1\1\11\1\1\3\11\1\1"+
+    "\1\11\1\1";
 
   private static int [] zzUnpackAttribute() {
-    int [] result = new int[78];
+    int [] result = new int[70];
     int offset = 0;
     offset = zzUnpackAttribute(ZZ_ATTRIBUTE_PACKED_0, offset, result);
     return result;
@@ -597,33 +595,64 @@ private Deque<PathContext> context = new ArrayDeque<>();
   context.push(PathContext.YAPPING);
 }
 
+private String getStateName(int state) {
+    switch(state) {
+        case AFTER_JSCOPE: return "AFTER_JSCOPE";
+        case AFTER_SLASH: return "AFTER_SLASH";
+        case BEFORE_JSCOPE: return "BEFORE_JSCOPE";
+        case BEFORE_SLASH: return "BEFORE_SLASH";
+        case PENDING_JSCOPE: return "PENDING_JSCOPE";
+        case PENDING_SLASH: return "PENDING_SLASH";
+        case LITERAL: return "LITERAL";
+        case REGEX: return "REGEX";
+        case REGEX_CLASS: return "REGEX_CLASS";
+        case YYINITIAL: return "YYINITIAL";
+        default: return "ERROR_UNKNOWN_STATE";
+    }
+}
+
+private void debugCurrentState(String methodName) {
+    System.out.println(
+        methodName + ": " + getStateName(yystate()) + ": " + context
+    );
+}
+
 private int getCurrentFallback() {
+    debugCurrentState("getCurrentFallback");
     return context.peek().fallback;
 }
 // file path interrupts the current segment and starts a new one that's file
 // @asdf!asdf asdf!asdf !asdf !asdf
 private void startNewFilePath() {
+    debugCurrentState("START startNewFilePath");
     endCurrentPath();
     context.push(PathContext.FILE);
     yybegin(PathContext.FILE.initialState);
+    debugCurrentState("END startNewFilePath");
 }
 private void startNewJavaPath() {
+    debugCurrentState("START startNewJavaPath");
     endCurrentPath();
     context.push(PathContext.JAVA);
     yybegin(PathContext.JAVA.initialState);
+    debugCurrentState("END startNewJavaPath");
 }
 
 // new path that starts with a regex
 private void startNewYappingPathRegexStart() {
+    debugCurrentState("START startNewYappingPathRegexStart");
     endCurrentPath();
     yybegin(REGEX);
+    debugCurrentState("END startNewYappingPathRegexStart");
 }
 // new path that starts with a literal
 // !asdf "asdf"
 //       ^
 private void startNewYappingPathLiteralStart() {
+    debugCurrentState("START startNewYappingPathLiteralStart");
     endCurrentPath();
     yybegin(LITERAL);
+    debugCurrentState("END startNewYappingPathLiteralStart");
 }
 
 // open parentheses on a new yapping path, e.g. [ ( {
@@ -632,8 +661,10 @@ private void startNewYappingPathLiteralStart() {
 // !asdf ( .. )
 //       ^
 private void startNewYappingPathOpenStart() {
+    debugCurrentState("START startNewYappingPathOpenStart");
     startNewYappingPath();
     context.push(PathContext.YAPPING);
+    debugCurrentState("END startNewYappingPathOpenStart");
 }
 
 // asdf asdf
@@ -645,8 +676,10 @@ private void startNewYappingPathOpenStart() {
 // @asdf, asdf
 //      ^
 private void startNewYappingPath() {
+    debugCurrentState("START startNewYappingPath");
     endCurrentPath();
     yybegin(YYINITIAL);
+    debugCurrentState("END startNewYappingPath");
 }
 
 // ends the current segment
@@ -664,13 +697,16 @@ private void endCurrentPath() {
 }
 
 private void openYappingSegment() {
+    debugCurrentState("START openYappingSegment");
     // encounter a (, {, or [ while in a segment
     context.push(PathContext.YAPPING);
     if(yystate() != PathContext.YAPPING.initialState) {
         yybegin(PathContext.YAPPING.initialState);
     }
+    debugCurrentState("END openYappingSegment");
 }
 private void closeCurrentSegment() {
+    debugCurrentState("START closeCurrentSegment");
     // encounter ), ], or }
     if(context.size() > 1 && context.peek() == PathContext.YAPPING) {
         context.pop();
@@ -707,6 +743,11 @@ private void closeCurrentSegment() {
     // todo - should we throw if we encounter mismatched segments?
     //        ex: asdf)asdf
     //        currently we just fall back to YAPPING and let the parser deal with it
+    debugCurrentState("END closeCurrentSegment");
+}
+
+private static String zzToPrintable(CharSequence cs) {
+    return zzToPrintable(cs.toString());
 }
 
 
@@ -719,6 +760,23 @@ private void closeCurrentSegment() {
     this.zzReader = in;
   }
 
+
+  private static String zzToPrintable(String str) {
+    StringBuilder builder = new StringBuilder();
+    for (int n = 0 ; n < str.length() ; ) {
+      int ch = str.codePointAt(n);
+      int charCount = Character.charCount(ch);
+      n += charCount;
+      if (ch > 31 && ch < 127) {
+        builder.append((char)ch);
+      } else if (charCount == 1) {
+        builder.append(String.format("\\u%04X", ch));
+      } else {
+        builder.append(String.format("\\U%06X", ch));
+      }
+    }
+    return builder.toString();
+  }
 
   /** Returns the maximum size of the scanner buffer, which limits the size of tokens. */
   private int zzMaxBufferLen() {
@@ -1021,17 +1079,23 @@ private void closeCurrentSegment() {
             zzDoEOF();
             switch (zzLexicalState) {
             case LITERAL: {
+              System.out.println("line: "+(yyline+1)+" "+"col: "+(yycolumn+1)+" "+"char: "+yychar+" "+"match: <<EOF>>");
+              System.out.println("action [455] { throw new Error(\"EOF while parsing string\"); }");
               throw new Error("EOF while parsing string");
             }  // fall though
-            case 79: break;
+            case 71: break;
             case REGEX: {
+              System.out.println("line: "+(yyline+1)+" "+"col: "+(yycolumn+1)+" "+"char: "+yychar+" "+"match: <<EOF>>");
+              System.out.println("action [468] { throw new Error(\"EOF while parsing `regex`\"); }");
               throw new Error("EOF while parsing `regex`");
             }  // fall though
-            case 80: break;
+            case 72: break;
             case REGEX_CLASS: {
+              System.out.println("line: "+(yyline+1)+" "+"col: "+(yycolumn+1)+" "+"char: "+yychar+" "+"match: <<EOF>>");
+              System.out.println("action [479] { throw new Error(\"EOF while parsing `regex`\"); }");
               throw new Error("EOF while parsing `regex`");
             }  // fall though
-            case 81: break;
+            case 73: break;
             default:
         return null;
         }
@@ -1039,259 +1103,353 @@ private void closeCurrentSegment() {
       else {
         switch (zzAction < 0 ? zzAction : ZZ_ACTION[zzAction]) {
           case 1:
+            System.out.println("line: "+(yyline+1)+" "+"col: "+(yycolumn+1)+" "+"char: "+yychar+" "+"match: --"+zzToPrintable(yytext())+"--");
+            System.out.println("action [340] { return YappingTypes.YNAME; }");
             { return YappingTypes.YNAME;
             }
           // fall through
           case 48: break;
           case 2:
+            System.out.println("line: "+(yyline+1)+" "+"col: "+(yycolumn+1)+" "+"char: "+yychar+" "+"match: --"+zzToPrintable(yytext())+"--");
+            System.out.println("action [338] { return TokenType.WHITE_SPACE; }");
             { return TokenType.WHITE_SPACE;
             }
           // fall through
           case 49: break;
           case 3:
+            System.out.println("line: "+(yyline+1)+" "+"col: "+(yycolumn+1)+" "+"char: "+yychar+" "+"match: --"+zzToPrintable(yytext())+"--");
+            System.out.println("action [310] { startNewJavaPath();"+ZZ_NL+"                                                        return YappingTypes.JPATH_START; }");
             { startNewJavaPath();
                                                         return YappingTypes.JPATH_START;
             }
           // fall through
           case 50: break;
           case 4:
+            System.out.println("line: "+(yyline+1)+" "+"col: "+(yycolumn+1)+" "+"char: "+yychar+" "+"match: --"+zzToPrintable(yytext())+"--");
+            System.out.println("action [351] { yybegin(LITERAL); }");
             { yybegin(LITERAL);
             }
           // fall through
           case 51: break;
           case 5:
+            System.out.println("line: "+(yyline+1)+" "+"col: "+(yycolumn+1)+" "+"char: "+yychar+" "+"match: --"+zzToPrintable(yytext())+"--");
+            System.out.println("action [337] { return YappingTypes.COMMENT; }");
             { return YappingTypes.COMMENT;
             }
           // fall through
           case 52: break;
           case 6:
+            System.out.println("line: "+(yyline+1)+" "+"col: "+(yycolumn+1)+" "+"char: "+yychar+" "+"match: --"+zzToPrintable(yytext())+"--");
+            System.out.println("action [482] { return TokenType.BAD_CHARACTER; }");
             { return TokenType.BAD_CHARACTER;
             }
           // fall through
           case 53: break;
           case 7:
+            System.out.println("line: "+(yyline+1)+" "+"col: "+(yycolumn+1)+" "+"char: "+yychar+" "+"match: --"+zzToPrintable(yytext())+"--");
+            System.out.println("action [379] { startNewYappingPath();"+ZZ_NL+"                                                        return YappingTypes.AND; }");
             { startNewYappingPath();
                                                         return YappingTypes.AND;
             }
           // fall through
           case 54: break;
           case 8:
+            System.out.println("line: "+(yyline+1)+" "+"col: "+(yycolumn+1)+" "+"char: "+yychar+" "+"match: --"+zzToPrintable(yytext())+"--");
+            System.out.println("action [368] { openYappingSegment();"+ZZ_NL+"                                                        return YappingTypes.PRECEDENCE_START; }");
             { openYappingSegment();
                                                         return YappingTypes.PRECEDENCE_START;
             }
           // fall through
           case 55: break;
           case 9:
+            System.out.println("line: "+(yyline+1)+" "+"col: "+(yycolumn+1)+" "+"char: "+yychar+" "+"match: --"+zzToPrintable(yytext())+"--");
+            System.out.println("action [372] { closeCurrentSegment();"+ZZ_NL+"                                                        return YappingTypes.PRECEDENCE_END; }");
             { closeCurrentSegment();
                                                         return YappingTypes.PRECEDENCE_END;
             }
           // fall through
           case 56: break;
           case 10:
+            System.out.println("line: "+(yyline+1)+" "+"col: "+(yycolumn+1)+" "+"char: "+yychar+" "+"match: --"+zzToPrintable(yytext())+"--");
+            System.out.println("action [383] { startNewYappingPath();"+ZZ_NL+"                                                        return YappingTypes.PLUS; }");
             { startNewYappingPath();
                                                         return YappingTypes.PLUS;
             }
           // fall through
           case 57: break;
           case 11:
+            System.out.println("line: "+(yyline+1)+" "+"col: "+(yycolumn+1)+" "+"char: "+yychar+" "+"match: --"+zzToPrintable(yytext())+"--");
+            System.out.println("action [326] { startNewYappingPath();"+ZZ_NL+"                                                        return YappingTypes.LIST_SEP; }");
             { startNewYappingPath();
                                                         return YappingTypes.LIST_SEP;
             }
           // fall through
           case 58: break;
           case 12:
+            System.out.println("line: "+(yyline+1)+" "+"col: "+(yycolumn+1)+" "+"char: "+yychar+" "+"match: --"+zzToPrintable(yytext())+"--");
+            System.out.println("action [387] { startNewYappingPath();"+ZZ_NL+"                                                        return YappingTypes.MINUS; }");
             { startNewYappingPath();
                                                         return YappingTypes.MINUS;
             }
           // fall through
           case 59: break;
           case 13:
+            System.out.println("line: "+(yyline+1)+" "+"col: "+(yycolumn+1)+" "+"char: "+yychar+" "+"match: --"+zzToPrintable(yytext())+"--");
+            System.out.println("action [343] { return YappingTypes.DOT; }");
             { return YappingTypes.DOT;
             }
           // fall through
           case 60: break;
           case 14:
-            { return YappingTypes.NATURAL;
+            System.out.println("line: "+(yyline+1)+" "+"col: "+(yycolumn+1)+" "+"char: "+yychar+" "+"match: --"+zzToPrintable(yytext())+"--");
+            System.out.println("action [344] { return YappingTypes.SLASH; }");
+            { return YappingTypes.SLASH;
             }
           // fall through
           case 61: break;
           case 15:
-            { startNewYappingPath();
-                                                        return YappingTypes.PROPERTY_SEP;
+            System.out.println("line: "+(yyline+1)+" "+"col: "+(yycolumn+1)+" "+"char: "+yychar+" "+"match: --"+zzToPrintable(yytext())+"--");
+            System.out.println("action [341] { return YappingTypes.NATURAL; }");
+            { return YappingTypes.NATURAL;
             }
           // fall through
           case 62: break;
           case 16:
+            System.out.println("line: "+(yyline+1)+" "+"col: "+(yycolumn+1)+" "+"char: "+yychar+" "+"match: --"+zzToPrintable(yytext())+"--");
+            System.out.println("action [330] { startNewYappingPath();"+ZZ_NL+"                                                        return YappingTypes.PROPERTY_SEP; }");
             { startNewYappingPath();
-                                                        return YappingTypes.PAIR_SEP;
+                                                        return YappingTypes.PROPERTY_SEP;
             }
           // fall through
           case 63: break;
           case 17:
+            System.out.println("line: "+(yyline+1)+" "+"col: "+(yycolumn+1)+" "+"char: "+yychar+" "+"match: --"+zzToPrintable(yytext())+"--");
+            System.out.println("action [322] { startNewYappingPath();"+ZZ_NL+"                                                        return YappingTypes.PAIR_SEP; }");
+            { startNewYappingPath();
+                                                        return YappingTypes.PAIR_SEP;
+            }
+          // fall through
+          case 64: break;
+          case 18:
+            System.out.println("line: "+(yyline+1)+" "+"col: "+(yycolumn+1)+" "+"char: "+yychar+" "+"match: --"+zzToPrintable(yytext())+"--");
+            System.out.println("action [305] { /* fall back to BEFORE_SLASH when we\'re done parsing regex or literal */"+ZZ_NL+"                                                        startNewFilePath();"+ZZ_NL+"                                                        return YappingTypes.FPATH_START; }");
             { /* fall back to BEFORE_SLASH when we're done parsing regex or literal */
                                                         startNewFilePath();
                                                         return YappingTypes.FPATH_START;
             }
           // fall through
-          case 64: break;
-          case 18:
+          case 65: break;
+          case 19:
+            System.out.println("line: "+(yyline+1)+" "+"col: "+(yycolumn+1)+" "+"char: "+yychar+" "+"match: --"+zzToPrintable(yytext())+"--");
+            System.out.println("action [360] { openYappingSegment();"+ZZ_NL+"                                                        return YappingTypes.LIST_START; }");
             { openYappingSegment();
                                                         return YappingTypes.LIST_START;
             }
           // fall through
-          case 65: break;
-          case 19:
+          case 66: break;
+          case 20:
+            System.out.println("line: "+(yyline+1)+" "+"col: "+(yycolumn+1)+" "+"char: "+yychar+" "+"match: --"+zzToPrintable(yytext())+"--");
+            System.out.println("action [364] { closeCurrentSegment();"+ZZ_NL+"                                                        return YappingTypes.LIST_END; }");
             { closeCurrentSegment();
                                                         return YappingTypes.LIST_END;
             }
           // fall through
-          case 66: break;
-          case 20:
-            { yybegin(REGEX);
-            }
-          // fall through
           case 67: break;
           case 21:
-            { openYappingSegment();
-                                                        return YappingTypes.MAP_START;
+            System.out.println("line: "+(yyline+1)+" "+"col: "+(yycolumn+1)+" "+"char: "+yychar+" "+"match: --"+zzToPrintable(yytext())+"--");
+            System.out.println("action [350] { yybegin(REGEX); }");
+            { yybegin(REGEX);
             }
           // fall through
           case 68: break;
           case 22:
-            { closeCurrentSegment();
-                                                        return YappingTypes.MAP_END;
+            System.out.println("line: "+(yyline+1)+" "+"col: "+(yycolumn+1)+" "+"char: "+yychar+" "+"match: --"+zzToPrintable(yytext())+"--");
+            System.out.println("action [352] { openYappingSegment();"+ZZ_NL+"                                                        return YappingTypes.MAP_START; }");
+            { openYappingSegment();
+                                                        return YappingTypes.MAP_START;
             }
           // fall through
           case 69: break;
           case 23:
-            { 
+            System.out.println("line: "+(yyline+1)+" "+"col: "+(yycolumn+1)+" "+"char: "+yychar+" "+"match: --"+zzToPrintable(yytext())+"--");
+            System.out.println("action [356] { closeCurrentSegment();"+ZZ_NL+"                                                        return YappingTypes.MAP_END; }");
+            { closeCurrentSegment();
+                                                        return YappingTypes.MAP_END;
             }
           // fall through
           case 70: break;
           case 24:
-            { yybegin(getCurrentFallback());
-                                                        return YappingTypes.LITERAL;
+            System.out.println("line: "+(yyline+1)+" "+"col: "+(yycolumn+1)+" "+"char: "+yychar+" "+"match: --"+zzToPrintable(yytext())+"--");
+            System.out.println("action [452] {  }");
+            { 
             }
           // fall through
           case 71: break;
           case 25:
-            { yybegin(REGEX_CLASS);
+            System.out.println("line: "+(yyline+1)+" "+"col: "+(yycolumn+1)+" "+"char: "+yychar+" "+"match: --"+zzToPrintable(yytext())+"--");
+            System.out.println("action [447] { yybegin(getCurrentFallback());"+ZZ_NL+"                                                        return YappingTypes.LITERAL; }");
+            { yybegin(getCurrentFallback());
+                                                        return YappingTypes.LITERAL;
             }
           // fall through
           case 72: break;
           case 26:
-            { yybegin(getCurrentFallback()); return YappingTypes.REGEX;
+            System.out.println("line: "+(yyline+1)+" "+"col: "+(yycolumn+1)+" "+"char: "+yychar+" "+"match: --"+zzToPrintable(yytext())+"--");
+            System.out.println("action [461] { yybegin(REGEX_CLASS); }");
+            { yybegin(REGEX_CLASS);
             }
           // fall through
           case 73: break;
           case 27:
-            { return YappingTypes.FNAME;
+            System.out.println("line: "+(yyline+1)+" "+"col: "+(yycolumn+1)+" "+"char: "+yychar+" "+"match: --"+zzToPrintable(yytext())+"--");
+            System.out.println("action [463] { yybegin(getCurrentFallback()); return YappingTypes.REGEX; }");
+            { yybegin(getCurrentFallback()); return YappingTypes.REGEX;
             }
           // fall through
           case 74: break;
           case 28:
-            { yybegin(PENDING_SLASH); return TokenType.WHITE_SPACE;
+            System.out.println("line: "+(yyline+1)+" "+"col: "+(yycolumn+1)+" "+"char: "+yychar+" "+"match: --"+zzToPrintable(yytext())+"--");
+            System.out.println("action [396] { return YappingTypes.FNAME; }");
+            { return YappingTypes.FNAME;
             }
           // fall through
           case 75: break;
           case 29:
-            { yybegin(PENDING_SLASH); return YappingTypes.COMMENT;
+            System.out.println("line: "+(yyline+1)+" "+"col: "+(yycolumn+1)+" "+"char: "+yychar+" "+"match: --"+zzToPrintable(yytext())+"--");
+            System.out.println("action [402] { yybegin(PENDING_SLASH); return TokenType.WHITE_SPACE; }");
+            { yybegin(PENDING_SLASH); return TokenType.WHITE_SPACE;
             }
           // fall through
           case 76: break;
           case 30:
-            { yybegin(AFTER_SLASH); return YappingTypes.SLASH;
+            System.out.println("line: "+(yyline+1)+" "+"col: "+(yycolumn+1)+" "+"char: "+yychar+" "+"match: --"+zzToPrintable(yytext())+"--");
+            System.out.println("action [401] { yybegin(PENDING_SLASH); return YappingTypes.COMMENT; }");
+            { yybegin(PENDING_SLASH); return YappingTypes.COMMENT;
             }
           // fall through
           case 77: break;
           case 31:
-            { yybegin(BEFORE_SLASH); return YappingTypes.FNAME;
+            System.out.println("line: "+(yyline+1)+" "+"col: "+(yycolumn+1)+" "+"char: "+yychar+" "+"match: --"+zzToPrintable(yytext())+"--");
+            System.out.println("action [399] { yybegin(AFTER_SLASH); return YappingTypes.SLASH; }");
+            { yybegin(AFTER_SLASH); return YappingTypes.SLASH;
             }
           // fall through
           case 78: break;
           case 32:
-            { return YappingTypes.SLASH;
+            System.out.println("line: "+(yyline+1)+" "+"col: "+(yycolumn+1)+" "+"char: "+yychar+" "+"match: --"+zzToPrintable(yytext())+"--");
+            System.out.println("action [422] { yybegin(BEFORE_SLASH); return YappingTypes.FNAME; }");
+            { yybegin(BEFORE_SLASH); return YappingTypes.FNAME;
             }
           // fall through
           case 79: break;
           case 33:
+            System.out.println("line: "+(yyline+1)+" "+"col: "+(yycolumn+1)+" "+"char: "+yychar+" "+"match: --"+zzToPrintable(yytext())+"--");
+            System.out.println("action [268] { startNewYappingPath();"+ZZ_NL+"                                                        return YappingTypes.YNAME; }");
             { startNewYappingPath();
                                                         return YappingTypes.YNAME;
             }
           // fall through
           case 80: break;
           case 34:
+            System.out.println("line: "+(yyline+1)+" "+"col: "+(yycolumn+1)+" "+"char: "+yychar+" "+"match: --"+zzToPrintable(yytext())+"--");
+            System.out.println("action [261] { // we are encountering a new literal"+ZZ_NL+"                                                        startNewYappingPathLiteralStart(); }");
             { // we are encountering a new literal
                                                         startNewYappingPathLiteralStart();
             }
           // fall through
           case 81: break;
           case 35:
+            System.out.println("line: "+(yyline+1)+" "+"col: "+(yycolumn+1)+" "+"char: "+yychar+" "+"match: --"+zzToPrintable(yytext())+"--");
+            System.out.println("action [292] { startNewYappingPathOpenStart();"+ZZ_NL+"                                                        return YappingTypes.PRECEDENCE_START; }");
             { startNewYappingPathOpenStart();
                                                         return YappingTypes.PRECEDENCE_START;
             }
           // fall through
           case 82: break;
           case 36:
+            System.out.println("line: "+(yyline+1)+" "+"col: "+(yycolumn+1)+" "+"char: "+yychar+" "+"match: --"+zzToPrintable(yytext())+"--");
+            System.out.println("action [272] { startNewYappingPath();"+ZZ_NL+"                                                        return YappingTypes.NATURAL; }");
             { startNewYappingPath();
                                                         return YappingTypes.NATURAL;
             }
           // fall through
           case 83: break;
           case 37:
+            System.out.println("line: "+(yyline+1)+" "+"col: "+(yycolumn+1)+" "+"char: "+yychar+" "+"match: --"+zzToPrintable(yytext())+"--");
+            System.out.println("action [284] { startNewYappingPathOpenStart();"+ZZ_NL+"                                                        return YappingTypes.LIST_START; }");
             { startNewYappingPathOpenStart();
                                                         return YappingTypes.LIST_START;
             }
           // fall through
           case 84: break;
           case 38:
+            System.out.println("line: "+(yyline+1)+" "+"col: "+(yycolumn+1)+" "+"char: "+yychar+" "+"match: --"+zzToPrintable(yytext())+"--");
+            System.out.println("action [265] { startNewYappingPathRegexStart(); }");
             { startNewYappingPathRegexStart();
             }
           // fall through
           case 85: break;
           case 39:
+            System.out.println("line: "+(yyline+1)+" "+"col: "+(yycolumn+1)+" "+"char: "+yychar+" "+"match: --"+zzToPrintable(yytext())+"--");
+            System.out.println("action [276] { startNewYappingPathOpenStart();"+ZZ_NL+"                                                        return YappingTypes.MAP_START; }");
             { startNewYappingPathOpenStart();
                                                         return YappingTypes.MAP_START;
             }
           // fall through
           case 86: break;
           case 40:
+            System.out.println("line: "+(yyline+1)+" "+"col: "+(yycolumn+1)+" "+"char: "+yychar+" "+"match: --"+zzToPrintable(yytext())+"--");
+            System.out.println("action [406] { return YappingTypes.JBODY; }");
             { return YappingTypes.JBODY;
             }
           // fall through
           case 87: break;
           case 41:
+            System.out.println("line: "+(yyline+1)+" "+"col: "+(yycolumn+1)+" "+"char: "+yychar+" "+"match: --"+zzToPrintable(yytext())+"--");
+            System.out.println("action [411] { yybegin(PENDING_JSCOPE); return TokenType.WHITE_SPACE; }");
             { yybegin(PENDING_JSCOPE); return TokenType.WHITE_SPACE;
             }
           // fall through
           case 88: break;
           case 42:
+            System.out.println("line: "+(yyline+1)+" "+"col: "+(yycolumn+1)+" "+"char: "+yychar+" "+"match: --"+zzToPrintable(yytext())+"--");
+            System.out.println("action [410] { yybegin(PENDING_JSCOPE); return YappingTypes.COMMENT; }");
             { yybegin(PENDING_JSCOPE); return YappingTypes.COMMENT;
             }
           // fall through
           case 89: break;
           case 43:
+            System.out.println("line: "+(yyline+1)+" "+"col: "+(yycolumn+1)+" "+"char: "+yychar+" "+"match: --"+zzToPrintable(yytext())+"--");
+            System.out.println("action [408] { yybegin(AFTER_JSCOPE); return YappingTypes.DOT; }");
             { yybegin(AFTER_JSCOPE); return YappingTypes.DOT;
             }
           // fall through
           case 90: break;
           case 44:
+            System.out.println("line: "+(yyline+1)+" "+"col: "+(yycolumn+1)+" "+"char: "+yychar+" "+"match: --"+zzToPrintable(yytext())+"--");
+            System.out.println("action [432] { yybegin(BEFORE_JSCOPE); return YappingTypes.JNAME; }");
             { yybegin(BEFORE_JSCOPE); return YappingTypes.JNAME;
             }
           // fall through
           case 91: break;
           case 45:
-            { return YappingTypes.YBODY;
-            }
-          // fall through
-          case 92: break;
-          case 46:
+            System.out.println("line: "+(yyline+1)+" "+"col: "+(yycolumn+1)+" "+"char: "+yychar+" "+"match: --"+zzToPrintable(yytext())+"--");
+            System.out.println("action [318] { startNewYappingPath();"+ZZ_NL+"                                                        return YappingTypes.TRANSITION_SEP_R; }");
             { startNewYappingPath();
                                                         return YappingTypes.TRANSITION_SEP_R;
             }
           // fall through
+          case 92: break;
+          case 46:
+            System.out.println("line: "+(yyline+1)+" "+"col: "+(yycolumn+1)+" "+"char: "+yychar+" "+"match: --"+zzToPrintable(yytext())+"--");
+            System.out.println("action [342] { return YappingTypes.YBODY; }");
+            { return YappingTypes.YBODY;
+            }
+          // fall through
           case 93: break;
           case 47:
+            System.out.println("line: "+(yyline+1)+" "+"col: "+(yycolumn+1)+" "+"char: "+yychar+" "+"match: --"+zzToPrintable(yytext())+"--");
+            System.out.println("action [314] { startNewYappingPath();"+ZZ_NL+"                                                        return YappingTypes.TRANSITION_SEP_L; }");
             { startNewYappingPath();
                                                         return YappingTypes.TRANSITION_SEP_L;
             }
@@ -1300,6 +1458,82 @@ private void closeCurrentSegment() {
           default:
             zzScanError(ZZ_NO_MATCH);
           }
+      }
+    }
+  }
+
+  /**
+   * Runs the scanner on input files.
+   *
+   * This main method is the debugging routine for the scanner.
+   * It prints debugging information about each returned token to
+   * System.out until the end of file is reached, or an error occured.
+   *
+   * @param argv   the command line, contains the filenames to run
+   *               the scanner on.
+   */
+  public static void main(String[] argv) {
+    if (argv.length == 0) {
+      System.out.println("Usage : java YappingLexer [ --encoding <name> ] <inputfile(s)>");
+    }
+    else {
+      int firstFilePos = 0;
+      String encodingName = "UTF-8";
+      if (argv[0].equals("--encoding")) {
+        firstFilePos = 2;
+        encodingName = argv[1];
+        try {
+          // Side-effect: is encodingName valid?
+          java.nio.charset.Charset.forName(encodingName);
+        } catch (Exception e) {
+          System.out.println("Invalid encoding '" + encodingName + "'");
+          return;
+        }
+      }
+      for (int i = firstFilePos; i < argv.length; i++) {
+        YappingLexer scanner = null;
+        java.io.FileInputStream stream = null;
+        java.io.Reader reader = null;
+        try {
+          stream = new java.io.FileInputStream(argv[i]);
+          reader = new java.io.InputStreamReader(stream, encodingName);
+          scanner = new YappingLexer(reader);
+          do {
+            System.out.println(scanner.advance());
+          } while (!scanner.zzAtEOF);
+
+        }
+        catch (java.io.FileNotFoundException e) {
+          System.out.println("File not found : \""+argv[i]+"\"");
+        }
+        catch (java.io.IOException e) {
+          System.out.println("IO error scanning file \""+argv[i]+"\"");
+          System.out.println(e);
+        }
+        catch (Exception e) {
+          System.out.println("Unexpected exception:");
+          e.printStackTrace();
+        }
+        finally {
+          if (reader != null) {
+            try {
+              reader.close();
+            }
+            catch (java.io.IOException e) {
+              System.out.println("IO error closing file \""+argv[i]+"\"");
+              System.out.println(e);
+            }
+          }
+          if (stream != null) {
+            try {
+              stream.close();
+            }
+            catch (java.io.IOException e) {
+              System.out.println("IO error closing file \""+argv[i]+"\"");
+              System.out.println(e);
+            }
+          }
+        }
       }
     }
   }

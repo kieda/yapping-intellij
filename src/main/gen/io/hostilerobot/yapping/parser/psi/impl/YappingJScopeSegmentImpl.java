@@ -11,14 +11,14 @@ import static io.hostilerobot.yapping.parser.YappingTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import io.hostilerobot.yapping.parser.psi.*;
 
-public class YappingTransitionLImpl extends ASTWrapperPsiElement implements YappingTransitionL {
+public class YappingJScopeSegmentImpl extends ASTWrapperPsiElement implements YappingJScopeSegment {
 
-  public YappingTransitionLImpl(@NotNull ASTNode node) {
+  public YappingJScopeSegmentImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull YappingVisitor visitor) {
-    visitor.visitTransitionL(this);
+    visitor.visitJScopeSegment(this);
   }
 
   @Override
@@ -28,21 +28,15 @@ public class YappingTransitionLImpl extends ASTWrapperPsiElement implements Yapp
   }
 
   @Override
-  @NotNull
-  public List<YappingBaseData> getBaseDataList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, YappingBaseData.class);
+  @Nullable
+  public YappingJSegmentMulti getJSegmentMulti() {
+    return findChildByClass(YappingJSegmentMulti.class);
   }
 
   @Override
   @Nullable
-  public YappingTransitionL getTransitionL() {
-    return findChildByClass(YappingTransitionL.class);
-  }
-
-  @Override
-  @NotNull
-  public List<YappingTransitionR> getTransitionRList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, YappingTransitionR.class);
+  public YappingJSegmentSingle getJSegmentSingle() {
+    return findChildByClass(YappingJSegmentSingle.class);
   }
 
 }

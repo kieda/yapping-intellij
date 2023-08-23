@@ -14,9 +14,12 @@ public interface YappingPairBounded extends PsiElement {
   YappingBoundedData getBoundedData();
 
   @Nullable
-  YappingTransitionL getTransitionL();
+  YappingTransitionLExpr getTransitionLExpr();
 
   @Nullable
-  YappingTransitionR getTransitionR();
+  YappingTransitionRExpr getTransitionRExpr();
+
+  @NotNull
+  List<YappingSpacing> getSpacingList();
 
 }

@@ -10,4 +10,7 @@ public interface YappingList extends PsiElement {
   @NotNull
   List<YappingBoundedData> getBoundedDataList();
 
+  @NotNull
+  List<YappingSpacing> getSpacingList();
+
 }

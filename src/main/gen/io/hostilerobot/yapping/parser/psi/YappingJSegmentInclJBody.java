@@ -5,6 +5,9 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface YappingYscopeSegment extends PsiElement {
+public interface YappingJSegmentInclJBody extends PsiElement {
+
+  @Nullable
+  YappingJSegmentExclJBody getJSegmentExclJBody();
 
 }

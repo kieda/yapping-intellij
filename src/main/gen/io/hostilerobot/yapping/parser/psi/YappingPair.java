@@ -7,16 +7,16 @@ import com.intellij.psi.PsiElement;
 
 public interface YappingPair extends PsiElement {
 
-  @NotNull
-  List<YappingBaseData> getBaseDataList();
+  @Nullable
+  YappingBaseData getBaseData();
 
   @Nullable
-  YappingPair getPair();
+  YappingPairExpr getPairExpr();
 
-  @NotNull
-  List<YappingTransitionL> getTransitionLList();
+  @Nullable
+  YappingTransitionLExpr getTransitionLExpr();
 
-  @NotNull
-  List<YappingTransitionR> getTransitionRList();
+  @Nullable
+  YappingTransitionRExpr getTransitionRExpr();
 
 }

@@ -5,9 +5,12 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface YappingYapping extends PsiElement {
+public interface YappingJPath extends PsiElement {
 
   @NotNull
-  List<YappingItem> getItemList();
+  YappingJScope getJScope();
+
+  @NotNull
+  YappingSpacing getSpacing();
 
 }

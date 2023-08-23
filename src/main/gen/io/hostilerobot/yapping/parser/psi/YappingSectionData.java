@@ -13,7 +13,4 @@ public interface YappingSectionData extends PsiElement {
   @Nullable
   YappingPair getPair();
 
-  @Nullable
-  YappingTransitionR getTransitionR();
-
 }
