@@ -441,14 +441,14 @@ public class YappingParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // Pair|TransitionL|TransitionR|BaseData
+  // Pair|TransitionLExpr|TransitionRExpr|BaseData
   public static boolean SectionData(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "SectionData")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, SECTION_DATA, "<section data>");
     r = Pair(b, l + 1);
-    if (!r) r = consumeToken(b, TRANSITIONL);
-    if (!r) r = consumeToken(b, TRANSITIONR);
+    if (!r) r = TransitionLExpr(b, l + 1);
+    if (!r) r = TransitionRExpr(b, l + 1);
     if (!r) r = BaseData(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
@@ -479,7 +479,7 @@ public class YappingParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // (TransitionRExpr|BaseData) spacing TRANSITION_SEP_L Pair
+  // (TransitionRExpr|BaseData) spacing TRANSITION_SEP_L spacing Pair
   public static boolean TransitionLExpr(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "TransitionLExpr")) return false;
     boolean r;
@@ -487,6 +487,7 @@ public class YappingParser implements PsiParser, LightPsiParser {
     r = TransitionLExpr_0(b, l + 1);
     r = r && spacing(b, l + 1);
     r = r && consumeToken(b, TRANSITION_SEP_L);
+    r = r && spacing(b, l + 1);
     r = r && Pair(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
@@ -517,7 +518,7 @@ public class YappingParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // BaseData spacing TRANSITION_SEP_R Pair
+  // BaseData spacing TRANSITION_SEP_R spacing Pair
   public static boolean TransitionRExpr(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "TransitionRExpr")) return false;
     boolean r;
@@ -525,6 +526,7 @@ public class YappingParser implements PsiParser, LightPsiParser {
     r = BaseData(b, l + 1);
     r = r && spacing(b, l + 1);
     r = r && consumeToken(b, TRANSITION_SEP_R);
+    r = r && spacing(b, l + 1);
     r = r && Pair(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
@@ -965,7 +967,7 @@ public class YappingParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // (YNAME|NATURAL|containedSegment|ySegmentMulti) (spacing DOT spacing yPathRest)?
+  // (ySegmentMulti|containedSegment|YNAME|NATURAL) (spacing DOT spacing yPathRest)?
   public static boolean yPathRest(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "yPathRest")) return false;
     boolean r;
@@ -976,14 +978,14 @@ public class YappingParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // YNAME|NATURAL|containedSegment|ySegmentMulti
+  // ySegmentMulti|containedSegment|YNAME|NATURAL
   private static boolean yPathRest_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "yPathRest_0")) return false;
     boolean r;
-    r = consumeToken(b, YNAME);
-    if (!r) r = consumeToken(b, NATURAL);
+    r = ySegmentMulti(b, l + 1);
     if (!r) r = containedSegment(b, l + 1);
-    if (!r) r = ySegmentMulti(b, l + 1);
+    if (!r) r = consumeToken(b, YNAME);
+    if (!r) r = consumeToken(b, NATURAL);
     return r;
   }
 
@@ -1124,33 +1126,11 @@ public class YappingParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // (Properties|(item yapping))?
+  // yapping_?
   static boolean yapping(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "yapping")) return false;
-    yapping_0(b, l + 1);
+    yapping_(b, l + 1);
     return true;
-  }
-
-  // Properties|(item yapping)
-  private static boolean yapping_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "yapping_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = Properties(b, l + 1);
-    if (!r) r = yapping_0_1(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // item yapping
-  private static boolean yapping_0_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "yapping_0_1")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = item(b, l + 1);
-    r = r && yapping(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
   }
 
   /* ********************************************************** */

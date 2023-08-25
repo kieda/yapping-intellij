@@ -77,8 +77,6 @@ public interface YappingTypes {
   IElementType PROPERTY_SEP = new YappingTokenType("PROPERTY_SEP");
   IElementType REGEX = new YappingTokenType("REGEX");
   IElementType SLASH = new YappingTokenType("SLASH");
-  IElementType TRANSITIONL = new YappingTokenType("TransitionL");
-  IElementType TRANSITIONR = new YappingTokenType("TransitionR");
   IElementType TRANSITION_SEP_L = new YappingTokenType("TRANSITION_SEP_L");
   IElementType TRANSITION_SEP_R = new YappingTokenType("TRANSITION_SEP_R");
   IElementType WHITESPACE = new YappingTokenType("WHITESPACE");

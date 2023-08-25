@@ -47,5 +47,8 @@
         <lang.parserDefinition
                 language="Yapping"
                 implementationClass="io.hostilerobot.yapping.parser.YappingParserDefinition"/>
+        <completion.contributor
+                language="Yapping"
+                implementationClass="io.hostilerobot.yapping.intellijplugin.completion.YappingCompletionContributor"/>
     </extensions>
 </idea-plugin>

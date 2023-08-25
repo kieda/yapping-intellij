@@ -47,8 +47,8 @@ public class YappingTransitionLExprImpl extends ASTWrapperPsiElement implements 
 
   @Override
   @NotNull
-  public YappingSpacing getSpacing() {
-    return findNotNullChildByClass(YappingSpacing.class);
+  public List<YappingSpacing> getSpacingList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, YappingSpacing.class);
   }
 
 }

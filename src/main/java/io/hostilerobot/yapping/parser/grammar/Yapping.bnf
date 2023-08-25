@@ -23,14 +23,14 @@
  *  // goes to the end of file
  */
 //yapping ::= item* Properties? {rightAssociative=true}
-yapping ::= (Properties|(item yapping))?
+yapping ::= yapping_?
 yapping_ ::= Properties|(item yapping_?)
 //items ::= (SectionData (COMMENT|WHITESPACE)+)*
 item ::=
     SectionData
     |COMMENT|WHITESPACE // whitespace
 
-SectionData ::= Pair|TransitionL|TransitionR|BaseData
+SectionData ::= Pair|TransitionLExpr|TransitionRExpr|BaseData
 
 BaseData ::=
     yPath1|jPath|fPath // paths. final path is a two part or more yapping segment
@@ -78,9 +78,9 @@ BaseData ::=
         | (ySegmentExclNat spacing DOT spacing yPathRest)
 
     // fun idea -- ipaddress: 127.0.0.1 693.5.9.3; -- note that 0.0 would represent a double otherwise
-    ySegmentExclNat ::= ySegmentMulti | YNAME | containedSegment // multi segments are not considered nats
+    ySegmentExclNat ::= ySegmentMulti | containedSegment | YNAME  // multi segments are not considered nats
 
-    yPathRest ::= (YNAME|NATURAL|containedSegment|ySegmentMulti) (spacing DOT spacing yPathRest)?
+    yPathRest ::= (ySegmentMulti|containedSegment|YNAME|NATURAL) (spacing DOT spacing yPathRest)?
     ySegmentMulti ::= (containedSegment ySegmentInclVals)
         | ((YNAME|NATURAL) ySegmentExclVals)
 
@@ -133,8 +133,8 @@ Precedence ::= PRECEDENCE_START spacing BoundedData spacing PRECEDENCE_END
 
 Pair ::= PairExpr|TransitionLExpr|TransitionRExpr|BaseData
 PairExpr ::= (TransitionLExpr|TransitionRExpr|BaseData) spacing PAIR_SEP spacing Pair {rightAssociative=true}
-TransitionLExpr ::= (TransitionRExpr|BaseData) spacing TRANSITION_SEP_L Pair {rightAssociative=true}
-TransitionRExpr ::= BaseData spacing TRANSITION_SEP_R Pair {rightAssociative=true}
+TransitionLExpr ::= (TransitionRExpr|BaseData) spacing TRANSITION_SEP_L spacing Pair {rightAssociative=true}
+TransitionRExpr ::= BaseData spacing TRANSITION_SEP_R spacing Pair {rightAssociative=true}
 
 
 BoundedData ::= PairBounded|TransitionLBounded|TransitionRBounded|Properties|BaseData

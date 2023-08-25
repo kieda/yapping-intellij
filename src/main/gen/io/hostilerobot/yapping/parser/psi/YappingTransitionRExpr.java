@@ -14,6 +14,6 @@ public interface YappingTransitionRExpr extends PsiElement {
   YappingPair getPair();
 
   @NotNull
-  YappingSpacing getSpacing();
+  List<YappingSpacing> getSpacingList();
 
 }
