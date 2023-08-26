@@ -220,7 +220,7 @@ LineTerminator = \r|\n|\r\n
 WHITESPACE     = ({LineTerminator} | [ \t\f])+
 COMMENT        = "#"[^\r\n]*{LineTerminator}?
 
-FNAMECHAR      = [^\/\"\`\!\@\,\r\n\t\f\=\-\:\;\ \#\[\]\(\)\{\}\<\>]
+FNAMECHAR      = [^\/\"\`\!\@\,\r\n\t\f\=\:\;\ \#\[\]\(\)\{\}\<\>]
 // permit hyphens in file names, but stop short of "->"
 // (asf-adf-)/
 // (asf-adf)->
@@ -228,7 +228,10 @@ FNAMECHAR      = [^\/\"\`\!\@\,\r\n\t\f\=\-\:\;\ \#\[\]\(\)\{\}\<\>]
 // last segment matches - but not ->
 // ({FNAMECHAR}|\-)+ "->"
 // ({FNAMECHAR}|\-)+ "-----"->
-FNAME          = !(!(({FNAMECHAR}|\-)+)|(({FNAMECHAR}|\-) "->"))
+// todo - have chars matching (FNAMECHAR|-)+, vs (FNAMECHAR|-)->
+// latter - roll back two chars
+FNAME          = {FNAMECHAR}+
+FNAME_ENDARROW = ({FNAMECHAR}+){TRANSITION_SEP_R}
 //({FNAMECHAR}|(\-({FNAMECHAR}|\-)))+ (!(!\-|{TRANSITION_SEP_R}))?
 // !{FNAMECHAR} = a [\/\"\`\!\@\r\n\t\f\-\ \#\[\]\(\)\{\}\<\>] [^]*
 //
@@ -432,6 +435,10 @@ TRANSITION_SEP_R="->"
 <BEFORE_SLASH> {
     // encounter a file name, state doesn't change.
     {FNAME}                                         {return YappingTypes.FNAME;}
+    {FNAME_ENDARROW}                                {
+          yypushback(2);
+          return YappingTypes.FNAME;
+      }
 
     // encountered a slash - we may now have whitespace
     {SLASH}                                         {yybegin(AFTER_SLASH); return YappingTypes.SLASH; }
@@ -467,6 +474,11 @@ TRANSITION_SEP_R="->"
     // file//asdf is fine
     {SLASH}                                         {return YappingTypes.SLASH;}
     {FNAME}                                         {yybegin(BEFORE_SLASH); return YappingTypes.FNAME;}
+    {FNAME_ENDARROW}                                {
+          yypushback(2);
+          yybegin(BEFORE_SLASH);
+          return YappingTypes.FNAME;
+      }
     // however we do require a name at the end, a dangling / is invalid (and can cause confusion)
     // e.g.        @my/folder/
     //             123  # resolves to my/folder/123
