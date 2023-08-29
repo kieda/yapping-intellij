@@ -10,6 +10,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static io.hostilerobot.yapping.parser.YappingTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import io.hostilerobot.yapping.parser.psi.*;
+import io.hostilerobot.yapping.parser.grammar.YappingStructureUtil;
 
 public class YappingTransitionLExprImpl extends ASTWrapperPsiElement implements YappingTransitionLExpr {
 
@@ -28,27 +29,75 @@ public class YappingTransitionLExprImpl extends ASTWrapperPsiElement implements 
   }
 
   @Override
-  @Nullable
-  public YappingBaseData getBaseData() {
-    return findChildByClass(YappingBaseData.class);
+  @NotNull
+  public List<YappingInteger> getIntegerList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, YappingInteger.class);
   }
 
   @Override
   @NotNull
-  public YappingPair getPair() {
-    return findNotNullChildByClass(YappingPair.class);
-  }
-
-  @Override
-  @Nullable
-  public YappingTransitionRExpr getTransitionRExpr() {
-    return findChildByClass(YappingTransitionRExpr.class);
+  public List<YappingList> getListList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, YappingList.class);
   }
 
   @Override
   @NotNull
-  public List<YappingSpacing> getSpacingList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, YappingSpacing.class);
+  public List<YappingMap> getMapList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, YappingMap.class);
+  }
+
+  @Override
+  @NotNull
+  public List<YappingPrecedence> getPrecedenceList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, YappingPrecedence.class);
+  }
+
+  @Override
+  @NotNull
+  public List<YappingQuotient> getQuotientList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, YappingQuotient.class);
+  }
+
+  @Override
+  @NotNull
+  public List<YappingReal> getRealList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, YappingReal.class);
+  }
+
+  @Override
+  @Nullable
+  public YappingTransitionLExpr getTransitionLExpr() {
+    return findChildByClass(YappingTransitionLExpr.class);
+  }
+
+  @Override
+  @NotNull
+  public List<YappingTransitionRExpr> getTransitionRExprList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, YappingTransitionRExpr.class);
+  }
+
+  @Override
+  @NotNull
+  public List<YappingFPath> getFPathList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, YappingFPath.class);
+  }
+
+  @Override
+  @NotNull
+  public List<YappingJPath> getJPathList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, YappingJPath.class);
+  }
+
+  @Override
+  @NotNull
+  public List<YappingYPath1> getYPath1List() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, YappingYPath1.class);
+  }
+
+  @Override
+  @NotNull
+  public List<YappingYSegmentMulti> getYSegmentMultiList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, YappingYSegmentMulti.class);
   }
 
 }

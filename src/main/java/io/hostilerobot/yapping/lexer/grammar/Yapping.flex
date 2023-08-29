@@ -13,7 +13,7 @@ import io.hostilerobot.yapping.parser.YappingTypes;import java.nio.file.Path;imp
 %function advance
 %type IElementType
 //%cup
-%debug
+//%debug
 %char
 %line
 %column
@@ -63,9 +63,9 @@ private String getStateName(int state) {
 }
 
 private void debugCurrentState(String methodName) {
-    System.out.println(
+    /*System.out.println(
         methodName + ": " + getStateName(yystate()) + ": " + context
-    );
+    );*/
 }
 
 private int getCurrentFallback() {
@@ -241,8 +241,8 @@ YFIRSTCHAR     = //[{YFIRSTCHAR} && [^0-9]]
     [^\/\"\`\!\@\,\r\n\t\f\=\-\:\;\ \#\[\]\(\)\{\}\<\>\&\+\'\$\|\~\*\^\%\\\?\%\.0-9]
 //YFIRSTCHAR     = [^\/\"\'\`\!\@\r\n\t\f\ \#\[\]\(\)\{\}\<\>\:\&\+\;\|\=\,\~\*\^\%\\\?\%\.[0-9]]
 //YBODYCHAR      = [^\/\"\'\`\!\@\r\n\t\f\ \#\[\]\(\)\{\}\<\>\:\&\-\+\;\|\=\,\~\*\^\%\\\?\%\.]
-YBODY          = ({YBODYCHAR})+    // asdf10hij
-YNAME          = {YFIRSTCHAR}({YBODYCHAR}*) // sadfasdf asdf10
+YBODY          = ({YBODYCHAR}|(\-{YFIRSTCHAR}))+    // asdf10hij maker-space10 10-asdf
+YNAME          = {YFIRSTCHAR}(({YBODYCHAR}|(\-{YFIRSTCHAR}))*) // sadfasdf asdf10 x10-asdf
 PLUS=\+
 MINUS=\-
 DOT=\.

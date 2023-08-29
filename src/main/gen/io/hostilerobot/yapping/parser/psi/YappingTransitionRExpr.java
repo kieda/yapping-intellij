@@ -8,12 +8,36 @@ import com.intellij.psi.PsiElement;
 public interface YappingTransitionRExpr extends PsiElement {
 
   @NotNull
-  YappingBaseData getBaseData();
+  List<YappingInteger> getIntegerList();
 
   @NotNull
-  YappingPair getPair();
+  List<YappingList> getListList();
 
   @NotNull
-  List<YappingSpacing> getSpacingList();
+  List<YappingMap> getMapList();
+
+  @NotNull
+  List<YappingPrecedence> getPrecedenceList();
+
+  @NotNull
+  List<YappingQuotient> getQuotientList();
+
+  @NotNull
+  List<YappingReal> getRealList();
+
+  @Nullable
+  YappingTransitionRExpr getTransitionRExpr();
+
+  @NotNull
+  List<YappingFPath> getFPathList();
+
+  @NotNull
+  List<YappingJPath> getJPathList();
+
+  @NotNull
+  List<YappingYPath1> getYPath1List();
+
+  @NotNull
+  List<YappingYSegmentMulti> getYSegmentMultiList();
 
 }

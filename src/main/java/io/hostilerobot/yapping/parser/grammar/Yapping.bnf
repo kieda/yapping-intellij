@@ -1,4 +1,4 @@
-//
+// todo - how do we use grammar kit both for intellij and for the language itself?
 {
     parserClass="io.hostilerobot.yapping.parser.YappingParser"
     extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
@@ -10,6 +10,16 @@
     elementTypeHolderClass="io.hostilerobot.yapping.parser.YappingTypes"
     elementTypeClass="io.hostilerobot.yapping.token.YappingElementType"
     tokenTypeClass="io.hostilerobot.yapping.token.YappingTokenType"
+    // mixin utilities to access recursively defined elements
+    psiImplUtilClass="io.hostilerobot.yapping.parser.grammar.YappingStructureUtil"
+    implements("Properties")="io.hostilerobot.yapping.parser.grammar.RecursiveListAccessible"
+    // maps and lists
+    implements("(Map|List)")="io.hostilerobot.yapping.parser.grammar.ListAccessible"
+    // paths
+    implements("(yPath1|jPath|fPath)")="io.hostilerobot.yapping.parser.grammar.ListAccessible"
+    // segments
+    implements("")
+    // todo - make pair types implement a getkey/getval structure.
 }
 
 /**
@@ -22,17 +32,13 @@
  *   properties2:
  *  // goes to the end of file
  */
-//yapping ::= item* Properties? {rightAssociative=true}
 yapping ::= yapping_?
-yapping_ ::= Properties|(item yapping_?)
-//items ::= (SectionData (COMMENT|WHITESPACE)+)*
-item ::=
-    SectionData
+private yapping_ ::= Properties|(item yapping_?)
+private item ::=
+    UnboundedData
     |COMMENT|WHITESPACE // whitespace
 
-SectionData ::= Pair|TransitionLExpr|TransitionRExpr|BaseData
-
-BaseData ::=
+private BaseData ::=
     yPath1|jPath|fPath // paths. final path is a two part or more yapping segment
     |ySegmentMulti  // single yapping segment (not a path)
     |Precedence // (x)
@@ -48,28 +54,28 @@ BaseData ::=
 // 0"asdf"                <invalid>
 // 0`[1-9]`               <invalid>
     jPath ::= (JPATH_START spacing jScope)
-    jScope ::= jScopeSegment (spacing DOT spacing jScope)?
-    jScopeSegment ::= (jSegmentMulti|jSegmentSingle)
+    private jScope ::= jScopeSegment (spacing DOT spacing jScope)?
+    private jScopeSegment ::= (jSegmentMulti|jSegmentSingle)
     // single item in the segment
-    jSegmentSingle ::= JNAME | containedSegment
+    private jSegmentSingle ::= JNAME | containedSegment
     // multiple items in the segment
-    jSegmentMulti ::=
+    private jSegmentMulti ::=
         (JNAME jSegmentExclJBody)
         | (containedSegment jSegmentInclJBody)
     // jBody or jName cannot show up twice in a row
-    jSegmentInclJBody ::= (JBODY jSegmentExclJBody?)
+    private jSegmentInclJBody ::= (JBODY jSegmentExclJBody?)
             | jSegmentExclJBody
-    jSegmentExclJBody ::= containedSegment jSegmentInclJBody?
+    private jSegmentExclJBody ::= containedSegment jSegmentInclJBody?
 
 // # file paths and scopes
     fPath ::= (FPATH_START spacing fScope)
-    fScope ::= fScopeSegment (spacing SLASH spacing fScope)?
-    fScopeSegment ::= fSegmentMulti | fSegmentSingle
-    fSegmentSingle ::= FNAME | containedSegment
-    fSegmentMulti ::= (containedSegment fSegmentInclFName)
+    private fScope ::= fScopeSegment (spacing SLASH spacing fScope)?
+    private fScopeSegment ::= fSegmentMulti | fSegmentSingle
+    private fSegmentSingle ::= FNAME | containedSegment
+    private fSegmentMulti ::= (containedSegment fSegmentInclFName)
         | (FNAME fSegmentExclFName)
-    fSegmentExclFName ::= containedSegment fSegmentInclFName?
-    fSegmentInclFName ::= (FNAME (fSegmentExclFName?))
+    private fSegmentExclFName ::= containedSegment fSegmentInclFName?
+    private fSegmentInclFName ::= (FNAME (fSegmentExclFName?))
         | fSegmentExclFName
 
 // # yapping paths and scopes
@@ -78,9 +84,9 @@ BaseData ::=
         | (ySegmentExclNat spacing DOT spacing yPathRest)
 
     // fun idea -- ipaddress: 127.0.0.1 693.5.9.3; -- note that 0.0 would represent a double otherwise
-    ySegmentExclNat ::= ySegmentMulti | containedSegment | YNAME  // multi segments are not considered nats
+    private ySegmentExclNat ::= ySegmentMulti | containedSegment | YNAME  // multi segments are not considered nats
 
-    yPathRest ::= (ySegmentMulti|containedSegment|YNAME|NATURAL) (spacing DOT spacing yPathRest)?
+    private yPathRest ::= (ySegmentMulti|containedSegment|YNAME|NATURAL) (spacing DOT spacing yPathRest)?
     ySegmentMulti ::= (containedSegment ySegmentInclVals)
         | ((YNAME|NATURAL) ySegmentExclVals)
 
@@ -89,8 +95,8 @@ BaseData ::=
     // NATURAL -> containedSegment
     // (yBody|yName) -> containedSegment
     // containedSegment -> YBODY|NATURAL|containedSegment
-    ySegmentExclVals ::= containedSegment ySegmentInclVals?
-    ySegmentInclVals ::= ((NATURAL|YBODY) ySegmentExclVals?)
+    private ySegmentExclVals ::= containedSegment ySegmentInclVals?
+    private ySegmentInclVals ::= ((NATURAL|YBODY) ySegmentExclVals?)
         | ySegmentExclVals
 
     // disallow NATURAL.NATURAL
@@ -108,11 +114,11 @@ BaseData ::=
  * DFA for processing integers
  */
 
-QUOTIENT ::= (INTEGER spacing AND spacing)? INTEGER spacing SLASH spacing NATURAL // 1 & 3/4, -1 &3/4, +1 & -3/4.
+QUOTIENT ::= (INTEGER spacing AND spacing)? INTEGER spacing SLASH spacing NATURAL // 1 & 3/4, -1 &3/4, +1 & -3/4, 1/2
 INTEGER ::= (SIGN spacing)? NATURAL
 REAL ::= (SIGN spacing)? DECIMAL
-DECIMAL ::= NATURAL DOT NATURAL // define DECIMAL in parser rather than lexer, as this might be part of a ysegment rather than a decimal
-SIGN ::= (PLUS|MINUS)
+private DECIMAL ::= NATURAL DOT NATURAL // define DECIMAL in parser rather than lexer, as this might be part of a ysegment rather than a decimal
+private SIGN ::= (PLUS|MINUS)
 
 // properties is just
 //     name1 : value1a value1b
@@ -120,42 +126,34 @@ SIGN ::= (PLUS|MINUS)
 // to nest properties, we use precedence
 //     name1 : value1a value1b
 //     (name2 : value2a value2b) value2c
-Properties ::= BaseData spacing PROPERTY_SEP (yapping_)?
-//Section ::= BaseData spacing PROPERTY_SEP item* {pin=3}
+Properties ::= BaseData spacing PROPERTY_SEP (yapping_)? {
+    methods=[isRecursiveType isElementType]
+}
 
 Map ::= (MAP_START spacing MAP_END) // {}
     // { a = b[, c = d]* }
-    | (MAP_START spacing PairBounded (spacing LIST_SEP spacing PairBounded)* spacing MAP_END)
+    | (MAP_START spacing PairBounded (spacing LIST_SEP spacing PairBounded)* spacing MAP_END) {
+        methods=[isElementType]
+    }
 List ::= (LIST_START LIST_END) // []
     // [a[, b]*]
-    | LIST_START spacing BoundedData (spacing LIST_SEP spacing BoundedData)* spacing LIST_END
+    | LIST_START spacing BoundedData (spacing LIST_SEP spacing BoundedData)* spacing LIST_END {
+        methods=[isElement]
+    }
 Precedence ::= PRECEDENCE_START spacing BoundedData spacing PRECEDENCE_END
 
-Pair ::= PairExpr|TransitionLExpr|TransitionRExpr|BaseData
-PairExpr ::= (TransitionLExpr|TransitionRExpr|BaseData) spacing PAIR_SEP spacing Pair {rightAssociative=true}
-TransitionLExpr ::= (TransitionRExpr|BaseData) spacing TRANSITION_SEP_L spacing Pair {rightAssociative=true}
-TransitionRExpr ::= BaseData spacing TRANSITION_SEP_R spacing Pair {rightAssociative=true}
+private UnboundedData ::= PairExpr|TransitionLExpr|TransitionRExpr|BaseData
+PairExpr ::= (TransitionLExpr|TransitionRExpr|BaseData) spacing PAIR_SEP spacing UnboundedData
+TransitionLExpr ::= (TransitionRExpr|BaseData) spacing TRANSITION_SEP_L spacing (TransitionLExpr|TransitionRExpr|BaseData)
+TransitionRExpr ::= BaseData spacing TRANSITION_SEP_R spacing (TransitionRExpr|BaseData)
 
-
-BoundedData ::= PairBounded|TransitionLBounded|TransitionRBounded|Properties|BaseData
-PairBounded ::= (TransitionLExpr|TransitionRExpr|BaseData) spacing PAIR_SEP spacing BoundedData {rightAssociative=true}
-TransitionLBounded ::= (TransitionRExpr|BaseData) spacing TRANSITION_SEP_L spacing BoundedData {rightAssociative=true}
-TransitionRBounded ::= BaseData spacing TRANSITION_SEP_R spacing BoundedData {rightAssociative=true}
-/*
-Pair ::= (BaseData|TransitionL|TransitionR) spacing PAIR_SEP spacing (BaseData|Pair|TransitionL|TransitionR){rightAssociative=true} // default pair. sectiona: x = y sectionb: asdf
-PairBounded ::= (BaseData|TransitionL|TransitionR) spacing PAIR_SEP spacing BoundedData{rightAssociative=true} // pair that may end in properties. (x = y = section: lol)
-// A -> B <- A -> B =
-TransitionL ::= (BaseData|TransitionR) spacing TRANSITION_SEP_L spacing (BaseData|TransitionL|TransitionR){rightAssociative=true}
-TransitionLBounded ::= (BaseData|TransitionR) spacing TRANSITION_SEP_L spacing (Properties|TransitionLBounded|TransitionRBounded|BaseData){rightAssociative=true}
-TransitionR ::= BaseData spacing TRANSITION_SEP_R spacing (BaseData|TransitionR){rightAssociative=true}
-TransitionRBounded ::= BaseData spacing TRANSITION_SEP_R spacing (Properties|TransitionRBounded|BaseData){rightAssociative=true}
-*/
-
-
-//BoundedData ::= Properties|PairBounded|TransitionLBounded|TransitionRBounded|BaseData // data that is surrounded by bounds
+private BoundedData ::= PairBounded|TransitionLBounded|TransitionRBounded|Properties|BaseData
+PairBounded ::= (TransitionLExpr|TransitionRExpr|BaseData) spacing PAIR_SEP spacing BoundedData
+TransitionLBounded ::= (TransitionRExpr|BaseData) spacing TRANSITION_SEP_L spacing (TransitionLBounded|TransitionRBounded|Properties|BaseData)
+TransitionRBounded ::= BaseData spacing TRANSITION_SEP_R spacing (TransitionRBounded|Properties|BaseData)
 
 // all these items that can be contained in a path and have incipient and terminator chars.
-containedSegment ::= REGEX|LITERAL|List|Map|Precedence
+private containedSegment ::= REGEX|LITERAL|List|Map|Precedence
 // asdf10&3/4 vs "asdf"10 & 3/4"asdf"
 // spacing items
-spacing ::= (WHITESPACE|COMMENT)*
+private spacing ::= (WHITESPACE|COMMENT)*

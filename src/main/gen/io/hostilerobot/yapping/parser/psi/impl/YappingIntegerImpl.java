@@ -10,6 +10,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static io.hostilerobot.yapping.parser.YappingTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import io.hostilerobot.yapping.parser.psi.*;
+import io.hostilerobot.yapping.parser.grammar.YappingStructureUtil;
 
 public class YappingIntegerImpl extends ASTWrapperPsiElement implements YappingInteger {
 
@@ -25,18 +26,6 @@ public class YappingIntegerImpl extends ASTWrapperPsiElement implements YappingI
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof YappingVisitor) accept((YappingVisitor)visitor);
     else super.accept(visitor);
-  }
-
-  @Override
-  @Nullable
-  public YappingSign getSign() {
-    return findChildByClass(YappingSign.class);
-  }
-
-  @Override
-  @Nullable
-  public YappingSpacing getSpacing() {
-    return findChildByClass(YappingSpacing.class);
   }
 
 }

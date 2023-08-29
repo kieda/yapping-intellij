@@ -8,9 +8,12 @@ import com.intellij.psi.PsiElement;
 public interface YappingJPath extends PsiElement {
 
   @NotNull
-  YappingJScope getJScope();
+  List<YappingList> getListList();
 
   @NotNull
-  YappingSpacing getSpacing();
+  List<YappingMap> getMapList();
+
+  @NotNull
+  List<YappingPrecedence> getPrecedenceList();
 
 }

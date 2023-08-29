@@ -10,6 +10,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static io.hostilerobot.yapping.parser.YappingTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import io.hostilerobot.yapping.parser.psi.*;
+import io.hostilerobot.yapping.parser.grammar.YappingStructureUtil;
 
 public class YappingYSegmentMultiImpl extends ASTWrapperPsiElement implements YappingYSegmentMulti {
 
@@ -28,21 +29,21 @@ public class YappingYSegmentMultiImpl extends ASTWrapperPsiElement implements Ya
   }
 
   @Override
-  @Nullable
-  public YappingContainedSegment getContainedSegment() {
-    return findChildByClass(YappingContainedSegment.class);
+  @NotNull
+  public List<YappingList> getListList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, YappingList.class);
   }
 
   @Override
-  @Nullable
-  public YappingYSegmentExclVals getYSegmentExclVals() {
-    return findChildByClass(YappingYSegmentExclVals.class);
+  @NotNull
+  public List<YappingMap> getMapList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, YappingMap.class);
   }
 
   @Override
-  @Nullable
-  public YappingYSegmentInclVals getYSegmentInclVals() {
-    return findChildByClass(YappingYSegmentInclVals.class);
+  @NotNull
+  public List<YappingPrecedence> getPrecedenceList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, YappingPrecedence.class);
   }
 
 }

@@ -10,6 +10,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static io.hostilerobot.yapping.parser.YappingTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import io.hostilerobot.yapping.parser.psi.*;
+import io.hostilerobot.yapping.parser.grammar.YappingStructureUtil;
 
 public class YappingFPathImpl extends ASTWrapperPsiElement implements YappingFPath {
 
@@ -29,14 +30,20 @@ public class YappingFPathImpl extends ASTWrapperPsiElement implements YappingFPa
 
   @Override
   @NotNull
-  public YappingFScope getFScope() {
-    return findNotNullChildByClass(YappingFScope.class);
+  public List<YappingList> getListList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, YappingList.class);
   }
 
   @Override
   @NotNull
-  public YappingSpacing getSpacing() {
-    return findNotNullChildByClass(YappingSpacing.class);
+  public List<YappingMap> getMapList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, YappingMap.class);
+  }
+
+  @Override
+  @NotNull
+  public List<YappingPrecedence> getPrecedenceList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, YappingPrecedence.class);
   }
 
 }

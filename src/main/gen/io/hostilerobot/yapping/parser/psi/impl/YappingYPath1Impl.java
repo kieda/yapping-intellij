@@ -10,6 +10,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static io.hostilerobot.yapping.parser.YappingTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import io.hostilerobot.yapping.parser.psi.*;
+import io.hostilerobot.yapping.parser.grammar.YappingStructureUtil;
 
 public class YappingYPath1Impl extends ASTWrapperPsiElement implements YappingYPath1 {
 
@@ -29,20 +30,26 @@ public class YappingYPath1Impl extends ASTWrapperPsiElement implements YappingYP
 
   @Override
   @NotNull
-  public List<YappingSpacing> getSpacingList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, YappingSpacing.class);
-  }
-
-  @Override
-  @Nullable
-  public YappingYPathRest getYPathRest() {
-    return findChildByClass(YappingYPathRest.class);
+  public List<YappingList> getListList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, YappingList.class);
   }
 
   @Override
   @NotNull
-  public YappingYSegmentExclNat getYSegmentExclNat() {
-    return findNotNullChildByClass(YappingYSegmentExclNat.class);
+  public List<YappingMap> getMapList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, YappingMap.class);
+  }
+
+  @Override
+  @NotNull
+  public List<YappingPrecedence> getPrecedenceList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, YappingPrecedence.class);
+  }
+
+  @Override
+  @NotNull
+  public List<YappingYSegmentMulti> getYSegmentMultiList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, YappingYSegmentMulti.class);
   }
 
 }

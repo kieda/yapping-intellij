@@ -8,12 +8,39 @@ import com.intellij.psi.PsiElement;
 public interface YappingTransitionRBounded extends PsiElement {
 
   @NotNull
-  YappingBaseData getBaseData();
+  List<YappingInteger> getIntegerList();
 
   @NotNull
-  YappingBoundedData getBoundedData();
+  List<YappingList> getListList();
 
   @NotNull
-  List<YappingSpacing> getSpacingList();
+  List<YappingMap> getMapList();
+
+  @NotNull
+  List<YappingPrecedence> getPrecedenceList();
+
+  @Nullable
+  YappingProperties getProperties();
+
+  @NotNull
+  List<YappingQuotient> getQuotientList();
+
+  @NotNull
+  List<YappingReal> getRealList();
+
+  @Nullable
+  YappingTransitionRBounded getTransitionRBounded();
+
+  @NotNull
+  List<YappingFPath> getFPathList();
+
+  @NotNull
+  List<YappingJPath> getJPathList();
+
+  @NotNull
+  List<YappingYPath1> getYPath1List();
+
+  @NotNull
+  List<YappingYSegmentMulti> getYSegmentMultiList();
 
 }

@@ -10,6 +10,8 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static io.hostilerobot.yapping.parser.YappingTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import io.hostilerobot.yapping.parser.psi.*;
+import io.hostilerobot.yapping.parser.grammar.YappingStructureUtil;
+import com.intellij.psi.tree.IElementType;
 
 public class YappingMapImpl extends ASTWrapperPsiElement implements YappingMap {
 
@@ -34,9 +36,8 @@ public class YappingMapImpl extends ASTWrapperPsiElement implements YappingMap {
   }
 
   @Override
-  @NotNull
-  public List<YappingSpacing> getSpacingList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, YappingSpacing.class);
+  public boolean isElementType(IElementType type) {
+    return YappingStructureUtil.isElementType(this, type);
   }
 
 }

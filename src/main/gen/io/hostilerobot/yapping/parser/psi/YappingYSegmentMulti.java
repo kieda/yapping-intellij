@@ -7,13 +7,13 @@ import com.intellij.psi.PsiElement;
 
 public interface YappingYSegmentMulti extends PsiElement {
 
-  @Nullable
-  YappingContainedSegment getContainedSegment();
+  @NotNull
+  List<YappingList> getListList();
 
-  @Nullable
-  YappingYSegmentExclVals getYSegmentExclVals();
+  @NotNull
+  List<YappingMap> getMapList();
 
-  @Nullable
-  YappingYSegmentInclVals getYSegmentInclVals();
+  @NotNull
+  List<YappingPrecedence> getPrecedenceList();
 
 }

@@ -7,13 +7,4 @@ import com.intellij.psi.PsiElement;
 
 public interface YappingReal extends PsiElement {
 
-  @NotNull
-  YappingDecimal getDecimal();
-
-  @Nullable
-  YappingSign getSign();
-
-  @Nullable
-  YappingSpacing getSpacing();
-
 }

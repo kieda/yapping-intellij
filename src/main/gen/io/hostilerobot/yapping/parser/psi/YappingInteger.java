@@ -7,10 +7,4 @@ import com.intellij.psi.PsiElement;
 
 public interface YappingInteger extends PsiElement {
 
-  @Nullable
-  YappingSign getSign();
-
-  @Nullable
-  YappingSpacing getSpacing();
-
 }

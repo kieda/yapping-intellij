@@ -47,6 +47,11 @@
         <lang.parserDefinition
                 language="Yapping"
                 implementationClass="io.hostilerobot.yapping.parser.YappingParserDefinition"/>
+        <lang.syntaxHighlighterFactory
+                language="Yapping"
+                implementationClass="io.hostilerobot.yapping.intellijplugin.highlighting.YappingHighlighterFactory"/>
+        <colorSettingsPage
+                implementation="io.hostilerobot.yapping.intellijplugin.highlighting.YappingColorSettingsPage"/>
         <completion.contributor
                 language="Yapping"
                 implementationClass="io.hostilerobot.yapping.intellijplugin.completion.YappingCompletionContributor"/>
